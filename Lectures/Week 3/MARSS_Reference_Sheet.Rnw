@@ -1,0 +1,256 @@
+%\VignetteIndexEntry{Quick Start Guide}
+%\VignettePackage{MARSS}
+\documentclass[12pt]{article}
+\usepackage[landscape]{geometry}
+\usepackage{hyperref}
+\usepackage{array}
+
+%\input{tex/mathdefs}
+\usepackage{amsmath} % the standard math package
+%%%% bold maths symbol system:
+\def\AA{\mbox{$\mathbf A$}}
+\def\aa{\mbox{$\mathbf a$}}
+\def\BB{\mbox{$\mathbf B$}}
+\def\bb{\mbox{$\mathbf b$}}
+\def\CC{\mbox{$\mathbf C$}}
+\def\cc{\mbox{$\mathbf c$}}
+\def\DD{\mbox{$\mathbf D$}}
+\def\dd{\mbox{$\mathbf d$}}
+\def\EE{\mbox{$\mathbf E$}}
+\def\ee{\mbox{$\mathbf e$}}
+\def\FF{\mbox{$\mathbf F$}}
+\def\ff{\mbox{$\mathbf f$}}
+\def\gg{\mbox{$\mathbf g$}}
+\def\GG{\mbox{$\mathbf G$}}
+\def\HH{\mbox{$\mathbf H$}}
+\def\II{\mbox{$\mathbf I$}}
+\def\LL{\mbox{$\mathbf L$}}
+\def\MM{\mbox{$\mathbf M$}}
+\def\mm{\mbox{$\mathbf m$}}
+\def\OO{\mbox{$\mathbf O$}}
+\def\PP{\mbox{$\mathbf P$}}
+\def\pp{\mbox{$\mathbf p$}}
+\def\QQ{\mbox{$\mathbf Q$}}
+\def\qq{\mbox{$\mathbf q$}}
+\def\RR{\mbox{$\mathbf R$}}
+\def\rr{\mbox{$\mathbf r$}}
+\def\UU{\mbox{$\mathbf U$}}
+\def\uu{\mbox{$\mathbf u$}}
+\def\VV{\mbox{$\mathbf V$}}
+\def\vv{\mbox{$\mathbf v$}}
+\def\WW{\mbox{$\mathbf W$}}
+\def\ww{\mbox{$\mathbf w$}}
+\def\XX{\mbox{$\mathbf X$}}
+\def\xx{\mbox{$\mathbf x$}}
+\def\YY{\mbox{$\mathbf Y$}}
+\def\yy{\mbox{$\mathbf y$}}
+\def\ZZ{\mbox{$\mathbf Z$}}
+\def\zz{\mbox{$\mathbf z$}}
+\def\et{\mbox{\boldmath $\eta$}}
+\def\ep{\mbox{\boldmath $\epsilon$}}
+\def\pipi{\mbox{\boldmath $\pi$}}
+\def\uupsilon{\pmb{\upsilon}}
+\def\llambda{\pmb{\lambda}}
+\def\bbeta{\pmb{\beta}}
+\def\aalpha{\pmb{\alpha}}
+\def\zzeta{\pmb{\zeta}}
+\def\etaeta{\mbox{\boldmath $\eta$}}
+\def\xixi{\mbox{\boldmath $\xi$}}
+\def\PI{\mbox{\boldmath $\mathrm{\Pi}$}}
+\def\LAM{\mbox{\boldmath $\mathrm{\Lambda}$}}
+\def\GAM{\mbox{\boldmath $\mathrm{\Gamma}$}}
+\def\SI{\mbox{\boldmath $\mathrm{\Sigma}$}}
+\def\TH{\mbox{\boldmath $\mathrm{\Theta}$}}
+\def\PH{\mbox{\boldmath $\mathrm{\Phi}$}}
+\def\zer{\mbox{\boldmath $0$}}
+\def\vec{\,\textup{\textrm{vec}}}
+\def\var{\,\textup{\textrm{var}}}
+\def\cov{\,\textup{\textrm{cov}}}
+\def\MVN{\,\textup{\textrm{MVN}}}
+\def\AIC{\,\textup{\textrm{AIC}}}
+\def\E{\,\textup{\textrm{E}}}
+\def\Lik{\,\textup{\textrm{L}}}
+\def\N{\,\textup{\textrm{N}}}
+\def\R{R}
+
+\title{MARSS Cheat Sheet}
+\begin{document}
+\SweaveOpts{concordance=FALSE}
+<<RUNFIRST, echo=FALSE>>=
+options(prompt=" ", continue=" ")
+@
+\section*{MARSS Reference Sheet}
+The default MARSS model (\verb@form="marxss"@) is written as follows:
+\begin{equation}\label{eqn:marss}
+\begin{gathered}
+\xx_t = \BB_t\xx_{t-1} + \uu_t + \CC_t\cc_t + \ww_t, \text{ where } \ww_t \sim \MVN(0,\QQ_t)\\
+\yy_t = \ZZ_t\xx_t + \aa_t + \DD_t\dd_t + \vv_t, \text{ where } \vv_t \sim \MVN(0,\RR_t)\\
+\xx_1 \sim \MVN(\pipi,\LAM) \text{ or } \xx_0 \sim \MVN(\pipi,\LAM)
+\end{gathered}
+\end{equation}
+$\cc$ and $\dd$ are inputs (numeric) and must have no missing values.  The MARSS package is designed to handle linear constraints within the parameter matrices (the $\BB$, $\uu$, $\CC$, $\QQ$, $\ZZ$, $\aa$, $\DD$, $\RR$, $\pipi$, and $\LAM$)).  Linear constraint means you can write the elements of the matrix as a linear equation of all the other elements, although typically each matrix element is just a fixed or estimated value.
+
+The following shows an example of a mean-reverting random walk model with three observation time series written as a MARSS model:
+\begin{gather*}
+\begin{bmatrix}x_1\\ x_2\end{bmatrix}_t
+= \begin{bmatrix}b&0\\ 0&b\end{bmatrix}
+\begin{bmatrix}x_1\\ x_2\end{bmatrix}_{t-1}
++ \begin{bmatrix}w_1\\ w_2\end{bmatrix}_t, \quad 
+\begin{bmatrix}w_1\\ w_2\end{bmatrix}_t \sim \MVN\begin{pmatrix}\begin{bmatrix}0\\0\end{bmatrix},\begin{bmatrix}q_{11}&q_{12}\\ q_{12}&q_{22}\end{bmatrix} \end{pmatrix}, \quad
+\begin{bmatrix}x_1\\ x_2\end{bmatrix}_0 \sim \MVN\begin{pmatrix}\begin{bmatrix}0\\ 0\end{bmatrix},\begin{bmatrix}1&0\\ 0&1\end{bmatrix} \end{pmatrix} \\
+\\
+\begin{bmatrix}y_1\\y_2\\y_3\end{bmatrix}_t
+= \begin{bmatrix}1&1\\ 0&1\\ 1&0\end{bmatrix}
+\begin{bmatrix}x_1\\x_2\end{bmatrix}_t
++ \begin{bmatrix}v_1\\ v_2\\ v_3\end{bmatrix}_t,\quad 
+\begin{bmatrix}v_1\\ v_2\\ v_3\end{bmatrix}_t \sim MVN\begin{pmatrix}\begin{bmatrix}a_1\\ 0\\ 0\end{bmatrix},
+ \begin{bmatrix}r_{11}&0&0\\ 0&r&0\\ 0&0&r\end{bmatrix} \end{pmatrix} 
+\end{gather*}
+
+To fit this with MARSS, we translate this model into equivalent matrices (or arrays if time-varying) in R:
+<<model.spec, eval=FALSE>>=
+B1=matrix(list("b",0,0,"b"),2,2)
+U1=matrix(0,2,1)
+Q1=matrix(c("q11","q12","q12","q22"),2,2)
+Z1=matrix(c(1,0,1,1,1,0),3,2)
+A1=matrix(list("a1",0,0),3,1)
+R1=matrix(list("r11",0,0,0,"r",0,0,0,"r"),3,3)
+pi1=matrix(0,2,1); V1=diag(1,2)
+model.list=list(B=B1,U=U1,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=0)
+@
+
+\section*{Defaults and shortcuts for model specification}
+
+\begin{center}
+\begin{tabular}{ | m{3cm} | m{5cm}| m{10cm} | } 
+ \hline
+ B &   &   \\ \hline
+ default & "identity" & identity matrix \\ 
+ shortcut & "unconstrained" & all elements estimated \\ 
+ shortcut & "diagonal and equal" & diagonal matrix with one value on the diagonal \\
+ shortcut & "diagonal and unequal" & diagonal matrix with unique values on the diagonal \\
+ numeric matrix & diag(0.8,2) & specify as matrix with numbers \\
+ char matrix & matrix(c("a","b"),2,2) & estimated matrix with only 2 estimated parameters \\
+ list matrix & matrix(list("a",2,1,"b"),2,2) & combine numeric (fixed) and estimated values \\
+ \hline
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{ | m{3cm} | m{5cm}| m{10cm} | } 
+ \hline
+ U and x0 &   &   \\ \hline
+ default & "unequal" & all u's different \\ 
+ shortcut & "unconstrained" & same as "unequal" \\ 
+ shortcut & "zero" & all zero \\
+ numeric matrix & matrix(1,2,1) & specify as matrix with numbers \\
+ char matrix & matrix(c("a","a"),2,1) & all estimated parameters \\
+ list matrix & matrix(list(0,"a"),2,1) & combine numeric (fixed) and estimated values \\
+ \hline
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{ | m{3cm} | m{5cm}| m{10cm} | } 
+ \hline
+ Q and R &   & All variance-covariance matrices are symmetric\\ \hline
+ default & "diagonal and unequal" & diagonal matrix with unique values on the diagonal; independent with different variances \\ 
+ shortcut & "diagonal and equal" & diagonal with one value on diagonal; i.i.d. \\ 
+ shortcut & "unconstrained" & unconstrained variance-covariance matrix \\
+ shortcut & "equalvarcov" & one variance and one covariance \\
+ shortcut & "identity" & i.i.d with variance of 1 \\
+ numeric matrix & diag(0.8,2) & specify as matrix with numbers \\
+ char matrix & matrix(c("a","c","c","b"),2,2) & specify constrained within a var-cov matrix; careful, matrix must be a valid var-cov structure \\
+ list matrix & matrix(list(1,0,0,"b"),2,2) & combine numeric (fixed) and estimated values; careful matrix must be a valid var-cov structure \\
+ \hline
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{ | m{3cm} | m{5cm}| m{10cm} | } 
+ \hline
+ Z &   &  Z num of columns will specify the num of x; columns of Z must match rows in u, B, Q (otherwise Z specifies a different num of x than u, B, Q)  \\ \hline
+ default & "identity" & identity matrix; means one x will be estimated for each y \\ 
+ numeric matrix & matrix(c(1,0,0,0,1,1),3,2) & specify as matrix with numbers; example is a design matrix with 0s and 1s (assigns each x to a y) \\
+ shortcut & "unconstrained" & all elements estimated; rarely used \\ 
+ shortcut & "diagonal and equal" & diagonal matrix with one value on the diagonal \\
+ shortcut & "diagonal and unequal" & diagonal matrix with unique values on the diagonal \\
+ char matrix & matrix(c("a","b"),2,2) & estimated matrix with only 2 estimated parameters \\
+ list matrix & matrix(list("a",2,1,"b"),2,2) & combine numeric (fixed) and estimated values \\
+ \hline
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{ | m{3cm} | m{5cm}| m{10cm} | } 
+ \hline
+ A &   &  \\ \hline
+ default & "scalar" & estimates an intercept; sets the first scalar of y assoc with an x to 0 \\ 
+ shortcut & "zero" & all zero \\
+ numeric matrix & matrix(1,2,1) & specify as matrix with numbers \\
+ list matrix & matrix(list(0,"a"),2,1) & combine numeric (fixed) and estimated values; make sure matrix does not lead to a indeterminant model \\
+ \hline
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{ | m{3cm} | m{5cm}| m{10cm} | } 
+ \hline
+ tinitx &   &  is x0 at t=0 or t=1 \\ \hline
+ default & 0 & at t=0 \\ 
+  & 1 & at t=1 \\ 
+  \hline
+\end{tabular}
+\end{center}
+
+\section*{Inputs - set to zero by default}
+
+\begin{center}
+\begin{tabular}{ | m{3cm} | m{5cm}| m{10cm} | } 
+ \hline
+ c &   & inputs; must be numeric; no missing values allowed; dimension is q x T (number of columns in y) \\ \hline
+ default & "zero" & if no inputs \\ 
+ if passed in & matrix(1,a,T) & if c passed in, must be a numeric matrix with same num of columns as y \\
+  \hline
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{ | m{3cm} | m{5cm}| m{10cm} | } 
+ \hline
+ C&   &  if passed in; dimension is m (rows in x) \times q (rows in c)\\ \hline
+ default & "zero" & if no c passed in, then default is zero \\ 
+ default & "unconstrained" & if c passed in, corresponding C has all elements estimated. \\
+ numeric matrix & matrix(1,m,q) & fixed values; specify as matrix with numbers \\
+ char matrix & matrix(list("b","a"),m,q) & all estimated values but some shared (equal) \\
+ list matrix & matrix(list(0,"a"),m,q) & combine numeric (fixed) and estimated values \\
+ \hline
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{ | m{3cm} | m{5cm}| m{10cm} | } 
+ \hline
+ d &   & inputs; must be numeric; no missing values allowed; dimension is p x T (number of columns in y) \\ \hline
+ default & "zero" & if no inputs \\ 
+ if passed in & matrix(1,p,T) & if c or d passed in, must be a numeric matrix with same num of columns as y \\
+  \hline
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{ | m{3cm} | m{5cm}| m{10cm} | } 
+ \hline
+ D&   &  if passed in; dimension is n (rows in y) \times p (rows in d)\\ \hline
+ default & "zero" & if no d passed in, then default is zero \\ 
+ default & "unconstrained" & if d passed in, corresponding D has all elements estimated. \\
+ numeric matrix & matrix(1,n,p) & fixed values; specify as matrix with numbers \\
+ char matrix & matrix(list("b","a"),n,p) & all estimated values but some shared (equal) \\
+ list matrix & matrix(list(0,"a"),n,p) & combine numeric (fixed) and estimated values \\
+ \hline
+\end{tabular}
+\end{center}
+<<Reset, echo=FALSE>>=
+options(prompt="> ", continue="+ ")
+@
+\end{document}

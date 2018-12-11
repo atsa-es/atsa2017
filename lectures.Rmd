@@ -1,0 +1,39 @@
+---
+title: "Lecture presentations"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+```
+
+| Week | Lecture   |      Topics      |  Reading |  R Code  |
+|--|----------|:-------------:|:------:|:------:|
+| 1 | [Introduction to Time Series](Lectures/Week 1/Lec 1 - Introduction to time series.pdf) |  Decomposition, backshift operator, differencing, etc |  | [Download data](Lectures/Week 1/week_1_misc_code.R) |
+| 1 | [Covariance and Correlation](Lectures/Week 1/Lec 2 - Covariance & correlation.pdf) |  Examining covariance and correlation   |  |  |
+|  | |  | |  |  |
+| 2 | [Univariate time series models](Lectures/Week 2/Lec 3 - Stationary & nonstationary models.pdf) |  Stationary and nonstationary models for univariate time series |  |  |
+| 2 | [Estimation and Forecasting](Lectures/Week 2/Lec 4 - Estimation & forecasting.pdf) |  Estimation procedures for fitting time series models   |  |  |
+|  | |  | |  |  |
+| 3 | [Univariate time series models](Lectures/Week 3/Lec 5 - Intro to Univariate State-Space Models.pdf) |  Introduction to univariate state-space models | [MARSS Ref Sheet](Lectures/Week 3/MARSS_Reference_Sheet.pdf) | [univariate_example_1.R](Lectures/Week 3/univariate_example_1.R) [univariate_example_2.R](Lectures/Week 3/univariate_example_2.R)  [univariate_example_3.R](Lectures/Week 3/univariate_example_3.R)  [univariate_example_4.R](Lectures/Week 3/univariate_example_4.R)|
+| 3 | [Estimation and Forecasting](Lectures/Week 3/Lec 6 - Intro to multivariate state-space models.pdf) |  Introduction to multivariate state-space models  |  | [MARSS_example_1.R](Lectures/Week 3/Lec_6_MARSS_example_1.R) [MARSS_example_2.R](Lectures/Week 3/Lec_6_MARSS_example_2.R) [MARSS_example_3.R](Lectures/Week 3/Lec_6_MARSS_example_3.R) [MARSS_example_4.R](Lectures/Week 3/Lec_6_MARSS_example_4.R) [MARSS_example_5.R](Lectures/Week 3/Lec_6_MARSS_example_5.R) |
+|  | |  | |  |  |
+| 4 | [Covariates in SS models](Lectures/Week 4/Lec 7 - Covariates in MARSS Models.pdf) |  Including seasonality and covariates in models; dealing with missing covariates and colinearity |  |  |
+|  | |  | |  |  |
+| 5 | [Intro to DLM](Lectures/Week 5/Lec 9 - Intro to Dynamic Linear Models.pdf) |  Introduction to Dynamic Linear Modeling |  |  |
+| 5 | [DLM Applications](Lectures/Week 5/Lec 10 - Applications of DLMs.pdf) |  Examples of real-world applications of DLMs.   |  |  |
+|  | |  | |  |  |
+| 6 | [Exponential Smoothing](Lectures/Week 6/Lec_11_-_Exponential_Smoothing_Models.pdf) |  Exponential smoothing models |  |  |
+| 6 | [Dynamic Factor Analysis](Lectures/Week 6/Lec 12 - Dynamic_Factor_Analysis.pdf) |  Dynamic factor analysis   |  |  [DFA_with_the_MARSS_pkg.R](Lectures/Week 6/DFA_with_the_MARSS_pkg.R) |
+|  | |  | |  |  |
+| 7 | [GLMs 1](Lectures/Week 7/Lec 14 - Review of GLMs.pdf) |  Reveiw of generalized linear models |  |  |
+| 7 | [GLMs 2](Lectures/Week 7/Lec 14 - Zeros and non-normal data.pdf) |  Dealing with zeros and non-normal data |  |  |
+| 7 | [Bayesian estimation](Lectures/Week 7/Lec 13 - Bayesian estimation in Stan.pdf) |  Bayesian estimation with STAN   |  |  |
+|  | |  | |  |  |
+| 8 | [Spatial correlation](Lectures/Week 8/Lec 15 - Including spatial correlation.pdf) |  Spatiotemporal models  |  | [Lec 15 - Analyzing Snotel data.R](Lectures/Week 8/Lec 15 - Analyzing Snotel data.R) |
+| 8 | [Estimating Interactions I](Lectures/Week 8/Lec 16 - Estimating Interactions I.pdf) |  Estimating species interaction strengths from ts data |  | [Gompertz_example_0.R](Lectures/Week 8/Gompertz_example_0.R) [Gompertz_example_1.R](Lectures/Week 8/Gompertz_example_1.R) [Gompertz_example_2.R](Lectures/Week 8/Gompertz_example_2.R) |
+|  | |  | |  |  |
+| 9 | [Estimating Interactions II](Lectures/Week 9/Lec 17 - Estimating Interactions II.pdf) |  Estimating species interaction strengths from ts data   |  | [GompertzSS_REML.R](Lectures/Week 8/GompertzSS_REML.R) |
+| 9 | [Intervention Effects](Lectures/Week 9/Lec 18 - Analyses of intervention effects & structural breaks.pdf) |  Detecting intervention effects in ts data  |  | [indicator_examples.R](Lectures/Week 9/indicator_examples.R) |
+| 9 | [Standardized Residuals](Lectures/Week 9/Lec 19 - Standardized residuals.pdf) | Detecting perturbations in ts data |  |  |

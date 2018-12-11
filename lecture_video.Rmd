@@ -1,0 +1,9 @@
+---
+title: "Lecture videos"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+

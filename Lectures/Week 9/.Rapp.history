@@ -1,0 +1,2098 @@
+if(max(primeF(nn)) > maxRC) {#
+	nc <- maxRC #
+	nr <- nn %% nc + nc#
+}
+nc
+nr
+plotOptim <- function(N,maxRC,page="L") {#
+    if(N == 1) #
+        return(1)#
+    factors <- numeric(0)#
+    i <- 1#
+    while(i < N) {#
+        i <- i + 1#
+        while((N%%i)==0) {#
+            factors <- c(factors, i)#
+            N <- N/i#
+        }#
+    }#
+	if(max(primeF(nn)) > maxRC) {#
+		nc <- maxRC #
+		nr <- nn %% nc + nc#
+	}#
+	return(c(nr,nc))#
+}
+plotOptim(10,3)
+plotOptim <- function(N,maxRC,page="P") {#
+    if(N == 1) #
+        return(1)#
+    factors <- numeric(0)#
+    i <- 1#
+    while(i < N) {#
+        i <- i + 1#
+        while((N%%i)==0) {#
+            factors <- c(factors, i)#
+            N <- N/i#
+        }#
+    }#
+	if(max(primeF(nn)) > maxRC) {#
+		nc <- maxRC #
+		nr <- nn %% nc + nc#
+	}#
+	dims <- c(nr,nc)#
+	if(page!="P") { dims <- rev(dim) }#
+	return(dims)#
+}
+plotOptim(10,3)
+plotOptim(10,3,"L")
+plotOptim <- function(N,maxRC,page="P") {#
+    if(N == 1) #
+        return(1)#
+    factors <- numeric(0)#
+    i <- 1#
+    while(i < N) {#
+        i <- i + 1#
+        while((N%%i)==0) {#
+            factors <- c(factors, i)#
+            N <- N/i#
+        }#
+    }#
+	if(max(primeF(nn)) > maxRC) {#
+		nc <- maxRC #
+		nr <- nn %% nc + nc#
+	}#
+	dims <- c(nr,nc)#
+	if(page!="P") { dims <- rev(dims) }#
+	return(dims)#
+}
+plotOptim(10,3,"L")
+plotOptim(10,5,"L")
+plotOptim <- function(N,maxRC,page="P") {#
+    if(N == 1) #
+        return(1)#
+    factors <- numeric(0)#
+    i <- 1#
+    while(i < N) {#
+        i <- i + 1#
+        while((N%%i)==0) {#
+            factors <- c(factors, i)#
+            N <- N/i#
+        }#
+    }#
+	if(max(factors) > maxRC) {#
+		nc <- maxRC #
+		nr <- nn %% nc + nc#
+	}#
+	dims <- c(nr,nc)#
+	if(page!="P") { dims <- rev(dims) }#
+	return(dims)#
+}
+plotOptim(10,5,"L")
+primeF(10)
+primeF(20)
+primeF(24)
+primeF(26)
+primeF(28)
+primeF(12)
+40*5
+40*500
+40*1500
+?decompose
+decompose
+?seq.int
+ww1 <- "ftp://aftp.cmdl.noaa.gov/products/"#
+ww2 <- "trends/co2/co2_mm_mlo.txt"#
+CO2 <- read.table(paste(ww1,ww2,sep=""))[,c(1,2,5)]
+head(CO2)
+library(MARSS)
+?RShowDoc
+RShowDoc("Chapter_DFA.R",package="MARSS")
+load the data (there are 3 datasets contained here)#
+data(lakeWAplankton)#
+# we want lakeWAplanktonTrans, which has been transformed#
+# so the 0s are replaced with NAs and the data z-scored#
+dat = lakeWAplanktonTrans#
+# use only the 10 years from 1980-1989#
+plankdat = dat[dat[,"Year"]>=1980 & dat[,"Year"]<1990,]#
+# create vector of phytoplankton group names#
+phytoplankton = c("Cryptomonas", "Diatoms", "Greens",#
+                  "Unicells", "Other.algae")#
+# get only the phytoplankton#
+dat.spp.1980 = plankdat[,phytoplankton]#
+####################################################
+### code chunk number 3: Cs02_transpose.data#
+####################################################
+# transpose data so time goes across columns#
+dat.spp.1980 = t(dat.spp.1980)#
+# get number of time series#
+N.ts = dim(dat.spp.1980)[1]#
+# get length of time series#
+TT = dim(dat.spp.1980)[2] #
+####################################################
+### code chunk number 4: Cs03_z.score#
+####################################################
+Sigma = sqrt(apply(dat.spp.1980, 1, var, na.rm=TRUE))#
+y.bar = apply(dat.spp.1980, 1, mean, na.rm=TRUE)#
+dat.z = (dat.spp.1980 - y.bar) * (1/Sigma)#
+rownames(dat.z) = rownames(dat.spp.1980)#
+####################################################
+### code chunk number 5: Cs04_plotdata#
+####################################################
+spp = rownames(dat.spp.1980)#
+par(mfcol=c(3,2), mar=c(3,4,1.5,0.5), oma=c(0.4,1,1,1))#
+for(i in spp){#
+  plot(dat.z[i,],xlab="",ylab="Abundance index", bty="L", xaxt="n", pch=16, col="blue", type="b")#
+  axis(1,12*(0:dim(dat.spp.1980)[2])+1,1980+0:dim(dat.spp.1980)[2])#
+  title(i)#
+  }#
+####################################################
+### code chunk number 6: Cs05_set.up.Z#
+####################################################
+Z.vals = list(#
+"z11",  0  ,  0  ,#
+"z21","z22",  0  ,#
+"z31","z32","z33",#
+"z41","z42","z43",#
+"z51","z52","z53")#
+Z = matrix(Z.vals, nrow=N.ts, ncol=3, byrow=TRUE)#
+####################################################
+### code chunk number 7: Cs06_print.Z#
+####################################################
+print(Z)#
+####################################################
+### code chunk number 8: Cs07_set.up.QR#
+####################################################
+Q = B = diag(1,3)#
+####################################################
+### code chunk number 9: Cs08_set.up#
+####################################################
+R.vals = list(#
+"r11",0,0,0,0,#
+0,"r22",0,0,0,#
+0,0,"r33",0,0,#
+0,0,0,"r44",0,#
+0,0,0,0,"r55")#
+R = matrix(R.vals, nrow=N.ts, ncol=N.ts, byrow=TRUE)#
+####################################################
+### code chunk number 10: Cs09_print#
+####################################################
+print(R)#
+####################################################
+### code chunk number 11: Cs10_set.up.R.short#
+####################################################
+R = "diagonal and unequal"#
+####################################################
+### code chunk number 12: Cs11_set.up.U#
+####################################################
+x0 = U = matrix(0, nrow=3, ncol=1)#
+A = matrix(0, nrow=6, ncol=1)#
+x0 = U = A = "zero"#
+####################################################
+### code chunk number 13: Cs12_set.up.x0#
+####################################################
+V0 = diag(5,3)#
+####################################################
+### code chunk number 14: Cs13_define.model.list#
+####################################################
+dfa.model = list(Z=Z, A="zero", R=R, B=B, U=U, Q=Q, x0=x0, V0=V0)#
+cntl.list = list(maxit=50)#
+####################################################
+### code chunk number 15: Cs14_fit.data#
+####################################################
+kemz.3 = MARSS(dat.z, model=dfa.model, control=cntl.list)#
+####################################################
+### code chunk number 18: Cs15_plotfits#
+####################################################
+fit = kemz.3#
+spp = rownames(dat.z)#
+par(mfcol=c(3,2), mar=c(3,4,1.5,0.5), oma=c(0.4,1,1,1))#
+for(i in 1:length(spp)){#
+	plot(dat.z[i,],xlab="",ylab="abundance index",bty="L", xaxt="n", ylim=c(-4,3), pch=16, col="blue")#
+	axis(1,12*(0:dim(dat.z)[2])+1,1980+0:dim(dat.z)[2])#
+	par.mat=coef(fit,type="matrix")#
+	lines(as.vector(par.mat$Z[i,,drop=FALSE]%*%fit$states+par.mat$A[i,]), lwd=2)#
+	title(spp[i])#
+	}
+code chunk number 20: Cs16_set.up.two.trends.echo#
+####################################################
+model.list = list(m=2, R="diagonal and unequal")#
+kemz.2 = MARSS(dat.spp.1980, model=model.list,#
+    z.score=TRUE, form="dfa", control=cntl.list)#
+####################################################
+### code chunk number 21: Cs17_compare.mods.2n3#
+####################################################
+print(cbind(model=c("3 trends", "2 trends"),#
+      AICc=round(c(kemz.3$AICc, kemz.2$AICc))),#
+      quote=FALSE)
+code chunk number 24: Cs19_makemodeltable#
+####################################################
+# calculate delta-AICc#
+model.data$delta.AICc = model.data$AICc - min(model.data$AICc)#
+# calculate Akaike weights#
+wt = exp(-0.5*model.data$delta.AICc)#
+model.data$Ak.wt = wt/sum(wt)#
+# sort results#
+model.tbl = model.data[order(model.data$AICc),-4]#
+# drop AICc from table#
+# calculate cumulative wts#
+model.tbl$Ak.wt.cum = cumsum(model.tbl$Ak.wt)#
+model.tbl = model.tbl[,-4]
+cntl.list = list(minit=200, maxit=5000, allow.degen=FALSE)#
+ # set up forms of R matrices#
+ levels.R = c("diagonal and equal",#
+              "diagonal and unequal",#
+              "equalvarcov",#
+              "unconstrained")#
+ model.data = data.frame()#
+ # fit lots of models & store results#
+ # NOTE: this will take a long time to run!#
+ for(R in levels.R) {#
+     for(m in 1:(N.ts-1)) {#
+         dfa.model = list(A="zero", R=R, m=m)#
+         kemz = MARSS(dat.z, model=dfa.model, control=cntl.list, #
+             form="dfa", z.score=TRUE)#
+         model.data = rbind(model.data,#
+                            data.frame(R=R,#
+                                       m=m,#
+                                       logLik=kemz$logLik,#
+                                       K=kemz$num.params,#
+                                       AICc=kemz$AICc,#
+                                       stringsAsFactors=FALSE))#
+         assign(paste("kemz", m, R, sep="."), kemz)#
+         } # end m loop#
+     } # end R loop
+start timer#
+timer.start <- proc.time()#
+ cntl.list = list(minit=200, maxit=5000, allow.degen=FALSE)#
+ # set up forms of R matrices#
+ levels.R = c("diagonal and equal",#
+              "diagonal and unequal",#
+              "equalvarcov",#
+              "unconstrained")#
+ model.data = data.frame()#
+ # fit lots of models & store results#
+ # NOTE: this will take a long time to run!#
+ for(R in levels.R) {#
+     for(m in 1:(N.ts-1)) {#
+         dfa.model = list(A="zero", R=R, m=m)#
+         kemz = MARSS(dat.z, model=dfa.model, control=cntl.list, #
+             form="dfa", z.score=TRUE)#
+         model.data = rbind(model.data,#
+                            data.frame(R=R,#
+                                       m=m,#
+                                       logLik=kemz$logLik,#
+                                       K=kemz$num.params,#
+                                       AICc=kemz$AICc,#
+                                       stringsAsFactors=FALSE))#
+         assign(paste("kemz", m, R, sep="."), kemz)#
+         } # end m loop#
+     } # end R loop#
+#
+# stop timer#
+(run.time.in.min <- round(((proc.time()-timer.start)/60)["elapsed"], 0))
+getwd()
+.libPaths()
+library(MARSS)
+library(forecast)
+.libPaths()
+library(MARSS)
+.libPaths()
+update.packages(checkBuilt=TRUE, ask=FALSE)
+library(MASS)
+library(MARSS)
+nn <- 50#
+#
+phi <- 0.5#
+#
+sigma <- 0.1#
+#
+xt <- wt <- rnorm(nn,0,0.1)
+nn <- 50#
+#
+phi <- 0.5#
+#
+sigma <- 0.1#
+#
+xt <- wt <- rnorm(nn,0,0.1)#
+#
+for(i in 2:nn) {#
+	xt[i] <- phi*xt[i-1] + wt[i]#
+}
+plot.ts(xt)
+nn <- 100#
+#
+phi <- 0.5#
+#
+sigma <- 0.1#
+#
+xt <- wt <- rnorm(nn,0,0.1)#
+#
+for(i in 2:nn) {#
+	xt[i] <- phi*xt[i-1] + wt[i]#
+}#
+#
+plot.ts(xt)
+?Arima
+?arima
+library(forecast)
+?Arima
+?tsStruct
+?tsstruct
+?structTS
+?structTs
+?structts
+library(forecast)
+?Arima
+library(MARSS)
+ls()
+library(MARSS)#
+library(MASS) #has mvrnorm#
+#x is the "hidden" trend we want to find#
+#x(t)=x(t-1)+slope+w(t), w(t)~N(0,q)#
+#x(0)=intercept#
+set.seed(123)#
+x0=1#
+u=0.05#
+q=.1#
+n=20#
+t=1:n#
+x=x0+u+rnorm(1,0,sqrt(q))#
+for(i in 2:n) x[i]=x[i-1]+u+rnorm(1,0,sqrt(q))#
+#y is our observation of x with error#
+#independent errors with the same variance#
+r=.1#
+nsites = 3#
+R=diag(r,nsites)#
+A=matrix(c(1, -2, -3),nsites,1)#
+y = matrix(NA,nsites,n)#
+for(i in 1:n) y[,i]=x[i]+mvrnorm(1,rep(0,nsites),R) + A#
+matplot(t(y), pch=as.character(1:nsites), ylab="Count", xlab="Time")#
+lines(x)#
+#Let's write x as a AR-1 model and y as an observation of that#
+#x(t) = x(t-1) + u + w(t), w(t)~N(0,q)  so w(t)=0#
+#x(0) = mu#
+#y(t,1) = x(t) + 0  + v(t), v(t)~N(0,r)#
+#y(t,2) = x(t) + a2 + v(t), v(t)~N(0,r)#
+#y(t,3) = x(t) + a4 + v(t), v(t)~N(0,r)#
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+  A=matrix(list(0,"a2","a3"),3,1),#
+  R="diagonal and equal",#
+  tinitx=0)#
+fit1=MARSS(y,model=mod.list)#
+lines(fit1$states[1,], col="blue", lwd=2)#
+legend("bottomright", c("true pop size", "estimated pop size"), col=c("black","blue"), lty=1, lwd=2)
+#y is our observation of x with error#
+#independent errors with the same variance#
+r=.1#
+nsites = 3#
+R=diag(r,nsites)#
+A=matrix(c(1, -2, -3),nsites,1)#
+y = matrix(NA,nsites,n)#
+for(i in 1:n) y[,i]=x[i]+mvrnorm(1,rep(0,nsites),R) + A#
+matplot(t(y), pch=as.character(1:nsites), ylab="Count", xlab="Time")#
+lines(x)
+#x(0)=intercept#
+x0=1#
+u=0.05#
+q=.1#
+n=20#
+t=1:n#
+x=x0+u+rnorm(1,0,sqrt(q))#
+for(i in 2:n) x[i]=x[i-1]+u+rnorm(1,0,sqrt(q))#
+#y is our observation of x with error#
+#independent errors with the DIFFERENT variance#
+r=c(.1,.01,.5)#
+nsites = 3#
+R=diag(r,nsites)#
+A=matrix(c(1, -2, -3),nsites,1)#
+y = matrix(NA,nsites,n)#
+for(i in 1:n) y[,i]=x[i]+mvrnorm(1,rep(0,nsites),R) + A#
+matplot(t(y), pch=as.character(1:nsites), ylab="Count", xlab="Time")#
+lines(x)
+#Let's write x as a AR-1 model and y as an observation of that#
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+  A="scaling",#
+  R="diagonal and unequal",#
+  tinitx=0)#
+#This might not coverge in 500 iterations...#
+fit2=MARSS(y,model=mod.list)#
+lines(fit2$states[1,], col="blue", lwd=2)#
+legend("bottomright", c("true pop size", "estimated pop size"), col=c("black","blue"), lty=1, lwd=2)
+#x is the "hidden" trend we want to find#
+#x(t)=x(t-1)+slope+w(t), w(t)~N(0,q)#
+#x(0)=intercept#
+x0=1#
+u=0.05#
+q=.1#
+n=20#
+t=1:n#
+x=x0+u+rnorm(1,0,sqrt(q))#
+for(i in 2:n) x[i]=x[i-1]+u+rnorm(1,0,sqrt(q))#
+#y is our observation of x with error#
+#first 2 surveys have the same variance and 3rd is different#
+r=c(.1,.1,1) #Two are the same#
+nsites = 3#
+R=diag(r,nsites)#
+A=matrix(c(1, -2, -3),nsites,1)#
+y = matrix(NA,nsites,n)#
+for(i in 1:n) y[,i]=x[i]+mvrnorm(1,rep(0,nsites),R) + A#
+matplot(t(y), pch=as.character(1:nsites), ylab="Count", xlab="Time")#
+lines(x)
+#y(t,3) = x(t) + a4 + v(t), v(t)~N(0,r)#
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+  A=matrix(list(0,"a2","a3"),3,1),#
+  R="diagonal and equal",#
+  tinitx=0)#
+fit1=MARSS(y,model=mod.list)
+set.seed(123)#
+x0=1#
+u=0.05#
+q=.1#
+n=20#
+t=1:n#
+x=x0+u+rnorm(1,0,sqrt(q))#
+for(i in 2:n) x[i]=x[i-1]+u+rnorm(1,0,sqrt(q))#
+#y is our observation of x with error#
+#independent errors with the same variance#
+r=.1#
+nsites = 3#
+R=diag(r,nsites)#
+A=matrix(c(1, -2, -3),nsites,1)#
+y = matrix(NA,nsites,n)#
+for(i in 1:n) y[,i]=x[i]+mvrnorm(1,rep(0,nsites),R) + A#
+matplot(t(y), pch=as.character(1:nsites), ylab="Count", xlab="Time")#
+lines(x)#
+#Let's write x as a AR-1 model and y as an observation of that#
+#x(t) = x(t-1) + u + w(t), w(t)~N(0,q)  so w(t)=0#
+#x(0) = mu#
+#y(t,1) = x(t) + 0  + v(t), v(t)~N(0,r)#
+#y(t,2) = x(t) + a2 + v(t), v(t)~N(0,r)#
+#y(t,3) = x(t) + a4 + v(t), v(t)~N(0,r)#
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+  A=matrix(list(0,"a2","a3"),3,1),#
+  R="diagonal and equal",#
+  tinitx=0)#
+fit1=MARSS(y,model=mod.list)
+lines(fit1$states[1,], col="blue", lwd=2)
+x0=1#
+u=0.05#
+q=.1#
+n=20#
+t=1:n#
+x=x0+u+rnorm(1,0,sqrt(q))#
+for(i in 2:n) x[i]=x[i-1]+u+rnorm(1,0,sqrt(q))#
+#y is our observation of x with error#
+#independent errors with the same variance#
+r=.1#
+nsites = 3#
+R=diag(r,nsites)#
+A=matrix(c(1, -2, -3),nsites,1)#
+y = matrix(NA,nsites,n)#
+for(i in 1:n) y[,i]=x[i]+mvrnorm(1,rep(0,nsites),R) + A#
+matplot(t(y), pch=as.character(1:nsites), ylab="Count", xlab="Time")#
+lines(x)#
+#Let's write x as a AR-1 model and y as an observation of that#
+#x(t) = x(t-1) + u + w(t), w(t)~N(0,q)  so w(t)=0#
+#x(0) = mu#
+#y(t,1) = x(t) + 0  + v(t), v(t)~N(0,r)#
+#y(t,2) = x(t) + a2 + v(t), v(t)~N(0,r)#
+#y(t,3) = x(t) + a4 + v(t), v(t)~N(0,r)#
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+  A=matrix(list(0,"a2","a3"),3,1),#
+  R="diagonal and equal",#
+  tinitx=0)#
+fit1=MARSS(y,model=mod.list)#
+lines(fit1$states[1,], col="blue", lwd=2)
+set.seed(123)#
+x0=1#
+u=0.05#
+q=.1#
+n=20#
+t=1:n#
+x=x0+u+rnorm(1,0,sqrt(q))#
+for(i in 2:n) x[i]=x[i-1]+u+rnorm(1,0,sqrt(q))#
+#y is our observation of x with error#
+#independent errors with the same variance#
+r=.1#
+nsites = 3#
+R=diag(r,nsites)#
+A=matrix(c(1, -2, -3),nsites,1)#
+y = matrix(NA,nsites,n)#
+for(i in 1:n) y[,i]=x[i]+mvrnorm(1,rep(0,nsites),R) + A#
+matplot(t(y), pch=as.character(1:nsites), ylab="Count", xlab="Time")#
+lines(x)#
+#Let's write x as a AR-1 model and y as an observation of that#
+#x(t) = x(t-1) + u + w(t), w(t)~N(0,q)  so w(t)=0#
+#x(0) = mu#
+#y(t,1) = x(t) + 0  + v(t), v(t)~N(0,r)#
+#y(t,2) = x(t) + a2 + v(t), v(t)~N(0,r)#
+#y(t,3) = x(t) + a4 + v(t), v(t)~N(0,r)#
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+  A=matrix(list("a1","a2","a3"),3,1),#
+  R="diagonal and equal",#
+  tinitx=0)#
+fit1=MARSS(y,model=mod.list)
+lines(fit1$states[1,], col="blue", lwd=2)
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+  A=matrix(list("a1",0,"a3"),3,1),#
+  R="diagonal and equal",#
+  tinitx=0)#
+fit1=MARSS(y,model=mod.list)
+lines(fit1$states[1,], col="blue", lwd=2)
+set.seed(123)#
+x0=1#
+u=0.05#
+q=.1#
+n=20#
+t=1:n#
+x=x0+u+rnorm(1,0,sqrt(q))#
+for(i in 2:n) x[i]=x[i-1]+u+rnorm(1,0,sqrt(q))#
+#y is our observation of x with error#
+#independent errors with the same variance#
+r=.1#
+nsites = 3#
+R=diag(r,nsites)#
+A=matrix(c(1, -2, -3),nsites,1)#
+y = matrix(NA,nsites,n)#
+for(i in 1:n) y[,i]=x[i]+mvrnorm(1,rep(0,nsites),R) + A#
+matplot(t(y), pch=as.character(1:nsites), ylab="Count", xlab="Time")
+lines(x, col="blue")
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+  A=matrix(list("a1","a2","a3"),3,1),#
+  R="diagonal and equal",#
+  tinitx=0)#
+fit1=MARSS(y,model=mod.list)#
+lines(fit1$states[1,], col="blue", lwd=2)
+mod.list$R="diagonal and unequal"
+#This might not coverge in 500 iterations...#
+fit2=MARSS(y,model=mod.list)
+#x(0)=intercept#
+set.seed(123)#
+x0=1#
+u=0.05#
+q=.1#
+n=20#
+t=1:n#
+x=x0+u+rnorm(1,0,sqrt(q))#
+for(i in 2:n) x[i]=x[i-1]+u+rnorm(1,0,sqrt(q))#
+#y is our observation of x with error#
+#independent errors with the same variance#
+r=.1#
+nsites = 3#
+R=diag(r,nsites)#
+A=matrix(c(1, -2, -3),nsites,1)#
+y = matrix(NA,nsites,n)#
+for(i in 1:n) y[,i]=x[i]+mvrnorm(1,rep(0,nsites),R) + A#
+matplot(t(y), pch=as.character(1:nsites), ylab="Count", xlab="Time")#
+lines(x, col="blue")#
+#Let's write x as a AR-1 model and y as an observation of that#
+#x(t) = x(t-1) + u + w(t), w(t)~N(0,q)  so w(t)=0#
+#x(0) = mu#
+#y(t,1) = x(t) + 0  + v(t), v(t)~N(0,r)#
+#y(t,2) = x(t) + a2 + v(t), v(t)~N(0,r)#
+#y(t,3) = x(t) + a4 + v(t), v(t)~N(0,r)#
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+  A=matrix(list("a1","a2","a3"),3,1),#
+  R="diagonal and equal",#
+  tinitx=0)#
+fit1=MARSS(y,model=mod.list)#
+lines(fit1$states[1,], col="blue", lwd=2)
+n=40#
+t=1:n#
+x=x0+u+rnorm(1,0,sqrt(q))#
+for(i in 2:n) x[i]=x[i-1]+u+rnorm(1,0,sqrt(q))#
+#y is our observation of x with error#
+#independent errors with the same variance#
+r=.1#
+nsites = 3#
+R=diag(r,nsites)#
+A=matrix(c(1, -2, -3),nsites,1)#
+y = matrix(NA,nsites,n)#
+for(i in 1:n) y[,i]=x[i]+mvrnorm(1,rep(0,nsites),R) + A#
+matplot(t(y), pch=as.character(1:nsites), ylab="Count", xlab="Time")#
+lines(x, col="blue")#
+#Let's write x as a AR-1 model and y as an observation of that#
+#x(t) = x(t-1) + u + w(t), w(t)~N(0,q)  so w(t)=0#
+#x(0) = mu#
+#y(t,1) = x(t) + 0  + v(t), v(t)~N(0,r)#
+#y(t,2) = x(t) + a2 + v(t), v(t)~N(0,r)#
+#y(t,3) = x(t) + a4 + v(t), v(t)~N(0,r)#
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+  A=matrix(list("a1","a2","a3"),3,1),#
+  R="diagonal and equal",#
+  tinitx=0)#
+fit1=MARSS(y,model=mod.list)
+mod.list$A="scaling"
+MARSS(y,model=mod.list)
+n=40#
+t=1:n#
+x=x0+u+rnorm(1,0,sqrt(q))#
+for(i in 2:n) x[i]=x[i-1]+u+rnorm(1,0,sqrt(q))#
+#y is our observation of x with error#
+#independent errors with the same variance#
+r=.1#
+nsites = 3#
+R=diag(r,nsites)#
+A=matrix(c(1, -2, -3),nsites,1)#
+y = matrix(NA,nsites,n)#
+for(i in 1:n) y[,i]=x[i]+mvrnorm(1,rep(0,nsites),R) + A#
+matplot(t(y), pch=as.character(1:nsites), ylab="Count", xlab="Time")#
+lines(x, col="blue")#
+#Let's write x as a AR-1 model and y as an observation of that#
+#x(t) = x(t-1) + u + w(t), w(t)~N(0,q)  so w(t)=0#
+#x(0) = mu#
+#y(t,1) = x(t) + 0  + v(t), v(t)~N(0,r)#
+#y(t,2) = x(t) + a2 + v(t), v(t)~N(0,r)#
+#y(t,3) = x(t) + a4 + v(t), v(t)~N(0,r)#
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+  A=matrix(list("a1","a2","a3"),3,1),#
+  R="diagonal and equal",#
+  tinitx=0)#
+fit1=MARSS(y,model=mod.list)
+x0=1#
+u=0.05#
+q=.1#
+n=40#
+t=1:n#
+x=x0+u+rnorm(1,0,sqrt(q))#
+for(i in 2:n) x[i]=x[i-1]+u+rnorm(1,0,sqrt(q))#
+#y is our observation of x with error#
+#independent errors with the same variance#
+r=.1#
+nsites = 3#
+R=diag(r,nsites)#
+A=matrix(c(1, -2, -3),nsites,1)#
+y = matrix(NA,nsites,n)#
+for(i in 1:n) y[,i]=x[i]+mvrnorm(1,rep(0,nsites),R) + A#
+matplot(t(y), pch=as.character(1:nsites), ylab="Count", xlab="Time")#
+lines(x, col="blue")#
+#Let's write x as a AR-1 model and y as an observation of that#
+#x(t) = x(t-1) + u + w(t), w(t)~N(0,q)  so w(t)=0#
+#x(0) = mu#
+#y(t,1) = x(t) + 0  + v(t), v(t)~N(0,r)#
+#y(t,2) = x(t) + a2 + v(t), v(t)~N(0,r)#
+#y(t,3) = x(t) + a4 + v(t), v(t)~N(0,r)#
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+#  A=matrix(list("a1","a2","a3"),3,1),#
+  A="scaling"#
+  R="diagonal and equal",#
+  tinitx=0)#
+fit1=MARSS(y,model=mod.list)
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+#  A=matrix(list("a1","a2","a3"),3,1),#
+  A="scaling",#
+  R="diagonal and equal",#
+  tinitx=0)#
+fit1=MARSS(y,model=mod.list)
+x=x0+u+rnorm(1,0,sqrt(q))#
+for(i in 2:n) x[i]=x[i-1]+u+rnorm(1,0,sqrt(q))#
+#y is our observation of x with error#
+#independent errors with the same variance#
+r=.1#
+nsites = 3#
+R=diag(r,nsites)#
+A=matrix(c(1, -2, -3),nsites,1)#
+y = matrix(NA,nsites,n)#
+for(i in 1:n) y[,i]=x[i]+mvrnorm(1,rep(0,nsites),R) + A#
+matplot(t(y), pch=as.character(1:nsites), ylab="Count", xlab="Time")#
+lines(x, col="blue")#
+#Let's write x as a AR-1 model and y as an observation of that#
+#x(t) = x(t-1) + u + w(t), w(t)~N(0,q)  so w(t)=0#
+#x(0) = mu#
+#y(t,1) = x(t) + 0  + v(t), v(t)~N(0,r)#
+#y(t,2) = x(t) + a2 + v(t), v(t)~N(0,r)#
+#y(t,3) = x(t) + a4 + v(t), v(t)~N(0,r)#
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+#  A=matrix(list("a1","a2","a3"),3,1),#
+  A="scaling",#
+  R="diagonal and equal",#
+  tinitx=0)#
+fit1=MARSS(y,model=mod.list)
+lines(fit1$states[1,], col="blue", lwd=2)
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+#  A=matrix(list("a1","a2","a3"),3,1),#
+  A="scaling",#
+  R="diagonal and equal",#
+  tinitx=1)#
+fit1=MARSS(y,model=mod.list)
+x0=1#
+u=0.05#
+q=.1#
+n=40#
+t=1:n#
+x=x0+u+rnorm(1,0,sqrt(q))#
+for(i in 2:n) x[i]=x[i-1]+u+rnorm(1,0,sqrt(q))#
+#y is our observation of x with error#
+#independent errors with the same variance#
+r=.1#
+nsites = 3#
+R=diag(r,nsites)#
+A=matrix(c(1, -2, -3),nsites,1)#
+y = matrix(NA,nsites,n)#
+for(i in 1:n) y[,i]=x[i]+mvrnorm(1,rep(0,nsites),R) + A#
+matplot(t(y), pch=as.character(1:nsites), ylab="Count", xlab="Time")#
+lines(x, col="blue")#
+#Let's write x as a AR-1 model and y as an observation of that#
+#x(t) = x(t-1) + u + w(t), w(t)~N(0,q)  so w(t)=0#
+#x(0) = mu#
+#y(t,1) = x(t) + 0  + v(t), v(t)~N(0,r)#
+#y(t,2) = x(t) + a2 + v(t), v(t)~N(0,r)#
+#y(t,3) = x(t) + a4 + v(t), v(t)~N(0,r)#
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+#  A=matrix(list("a1","a2","a3"),3,1),#
+  A="scaling",#
+  R="diagonal and equal",#
+  tinitx=1)#
+fit1=MARSS(y,model=mod.list)#
+lines(fit1$states[1,], col="blue", lwd=2)
+u=0.05#
+q=.1#
+n=40#
+t=1:n#
+x=x0+u+rnorm(1,0,sqrt(q))#
+for(i in 2:n) x[i]=x[i-1]+u+rnorm(1,0,sqrt(q))#
+#y is our observation of x with error#
+#independent errors with the same variance#
+r=.1#
+nsites = 3#
+R=diag(r,nsites)#
+A=matrix(c(1, -2, -3),nsites,1)#
+y = matrix(NA,nsites,n)#
+for(i in 1:n) y[,i]=x[i]+mvrnorm(1,rep(0,nsites),R) + A#
+matplot(t(y), pch=as.character(1:nsites), ylab="Count", xlab="Time")#
+lines(x, col="blue")#
+#Let's write x as a AR-1 model and y as an observation of that#
+#x(t) = x(t-1) + u + w(t), w(t)~N(0,q)  so w(t)=0#
+#x(0) = mu#
+#y(t,1) = x(t) + 0  + v(t), v(t)~N(0,r)#
+#y(t,2) = x(t) + a2 + v(t), v(t)~N(0,r)#
+#y(t,3) = x(t) + a4 + v(t), v(t)~N(0,r)#
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+#  A=matrix(list("a1","a2","a3"),3,1),#
+  A="scaling",#
+  R="diagonal and equal",#
+  tinitx=1)#
+fit1=MARSS(y,model=mod.list)#
+lines(fit1$states[1,], col="blue", lwd=3)
+matplot(t(y), pch=as.character(1:nsites), ylab="Count", xlab="Time")#
+lines(x, col="blue")#
+#Let's write x as a AR-1 model and y as an observation of that#
+#x(t) = x(t-1) + u + w(t), w(t)~N(0,q)  so w(t)=0#
+#x(0) = mu#
+#y(t,1) = x(t) + 0  + v(t), v(t)~N(0,r)#
+#y(t,2) = x(t) + a2 + v(t), v(t)~N(0,r)#
+#y(t,3) = x(t) + a4 + v(t), v(t)~N(0,r)#
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+  A=matrix(list("a1","a2","a3"),3,1),#
+#  A="scaling",#
+  R="diagonal and equal",#
+  tinitx=1)#
+fit1=MARSS(y,model=mod.list)#
+lines(fit1$states[1,], col="blue", lwd=3)
+u=0.05#
+q=.1#
+n=40#
+t=1:n#
+x=x0+u+rnorm(1,0,sqrt(q))#
+for(i in 2:n) x[i]=x[i-1]+u+rnorm(1,0,sqrt(q))#
+#y is our observation of x with error#
+#independent errors with the same variance#
+r=.1#
+nsites = 3#
+R=diag(r,nsites)#
+A=matrix(c(1, -2, -3),nsites,1)#
+y = matrix(NA,nsites,n)#
+for(i in 1:n) y[,i]=x[i]+mvrnorm(1,rep(0,nsites),R) + A#
+matplot(t(y), pch=as.character(1:nsites), ylab="Count", xlab="Time")#
+lines(x, col="blue")#
+#Let's write x as a AR-1 model and y as an observation of that#
+#x(t) = x(t-1) + u + w(t), w(t)~N(0,q)  so w(t)=0#
+#x(0) = mu#
+#y(t,1) = x(t) + 0  + v(t), v(t)~N(0,r)#
+#y(t,2) = x(t) + a2 + v(t), v(t)~N(0,r)#
+#y(t,3) = x(t) + a4 + v(t), v(t)~N(0,r)#
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+  A=matrix(list("a1","a2","a3"),3,1),#
+#  A="scaling",#
+  R="diagonal and equal",#
+  tinitx=1)#
+fit1=MARSS(y,model=mod.list)#
+lines(fit1$states[1,], col="blue", lwd=3)
+#Let's write x as a AR-1 model and y as an observation of that#
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+  A="scaling",#
+  A=matrix(c("a1","a2","a3"),3,1),#
+  R="diagonal and unequal",#
+  tinitx=0)#
+#This might not coverge in 500 iterations...#
+fit2=MARSS(y,model=mod.list)#
+lines(fit2$states[1,], col="purple", lwd=2)
+matplot(t(y), pch=as.character(1:nsites), ylab="Count", xlab="Time")#
+lines(x)
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+  A=matrix(list("a1","a2","a3"),3,1),#
+#  A="scaling",#
+  R="diagonal and equal",#
+  tinitx=1)#
+fit1=MARSS(y,model=mod.list)#
+lines(fit1$states[1,], col="blue", lwd=3)
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+#  A="scaling",#
+  A=matrix(c("a1","a2","a3"),3,1),#
+  R="diagonal and unequal",#
+  tinitx=0)#
+#This might not coverge in 500 iterations...#
+fit2=MARSS(y,model=mod.list)#
+lines(fit2$states[1,], col="purple", lwd=2)
+matplot(t(y), pch=as.character(1:nsites), ylab="Count", xlab="Time")#
+lines(x, col="blue")#
+#Let's write x as a AR-1 model and y as an observation of that#
+#x(t) = x(t-1) + u + w(t), w(t)~N(0,q)  so w(t)=0#
+#x(0) = mu#
+#y(t,1) = x(t) + 0  + v(t), v(t)~N(0,r)#
+#y(t,2) = x(t) + a2 + v(t), v(t)~N(0,r)#
+#y(t,3) = x(t) + a4 + v(t), v(t)~N(0,r)#
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+  A=matrix(list("a1","a2","a3"),3,1),#
+#  A="scaling",#
+  R="diagonal and equal",#
+  tinitx=0)#
+fit1=MARSS(y,model=mod.list)#
+lines(fit1$states[1,], col="blue", lwd=3)
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+#  A="scaling",#
+  A=matrix(c("a1","a2","a3"),3,1),#
+  R="diagonal and unequal",#
+  tinitx=0)#
+#This might not coverge in 500 iterations...#
+fit2=MARSS(y,model=mod.list)#
+lines(fit2$states[1,], col="purple", lwd=2)
+#independent errors with the DIFFERENT variance#
+r=c(.1,.01,.5)#
+nsites = 3#
+R=diag(r,nsites)#
+A=matrix(c(1, -2, -3),nsites,1)#
+y = matrix(NA,nsites,n)#
+for(i in 1:n) y[,i]=x[i]+mvrnorm(1,rep(0,nsites),R) + A#
+matplot(t(y), pch=as.character(1:nsites), ylab="Count", xlab="Time")#
+lines(x)#
+#Let's write x as a AR-1 model and y as an observation of that#
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+  A="scaling",#
+#  A=matrix(c("a1","a2","a3"),3,1),#
+  R="diagonal and unequal",#
+  tinitx=0)#
+#This might not coverge in 500 iterations...#
+fit2=MARSS(y,model=mod.list)#
+lines(fit2$states[1,], col="purple", lwd=2)
+matplot(t(y), pch=as.character(1:nsites), ylab="Count", xlab="Time")#
+lines(x, col="blue")#
+#Let's write x as a AR-1 model and y as an observation of that#
+#x(t) = x(t-1) + u + w(t), w(t)~N(0,q)  so w(t)=0#
+#x(0) = mu#
+#y(t,1) = x(t) + 0  + v(t), v(t)~N(0,r)#
+#y(t,2) = x(t) + a2 + v(t), v(t)~N(0,r)#
+#y(t,3) = x(t) + a4 + v(t), v(t)~N(0,r)#
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+  A=matrix(list("a1","a2","a3"),3,1),#
+#  A="scaling",#
+  R="diagonal and equal",#
+  tinitx=0)#
+fit1=MARSS(y,model=mod.list)#
+lines(fit1$states[1,], col="blue", lwd=3)
+mod.list=list(#
+  B=matrix(1),#
+  U=matrix("u"),#
+  Q=matrix("q"),#
+  x0=matrix("mu"),#
+  Z=matrix(1,nsites,1),#
+#  A=matrix(list("a1","a2","a3"),3,1),#
+  A="scaling",#
+  R="diagonal and equal",#
+  tinitx=0)#
+fit1=MARSS(y,model=mod.list)
+library(MARSS)
+RShowDoc("Chapter_DFA.R",package="MARSS")
+data(Nile)
+Nile
+library(MARSS)#
+#
+yy <- Nile
+yy <- Nile#
+BB <- matrix(1)#
+UU <- matrix(0)#
+QQ <- matrix("q")#
+#
+ZZ <- matrix(1)#
+AA <- matrix(0)#
+RR <- matrix("r")#
+#
+mod.list <- (B=BB, U=UU, Q=QQ, Z=ZZ, A=AA, R=RR)#
+#
+MARSS(yy, model=mod.list)
+mod.list <- list(B=BB, U=UU, Q=QQ, Z=ZZ, A=AA, R=RR)#
+#
+MARSS(yy, model=mod.list)
+yy <- matrix(Nile, nrow=1)#
+BB <- matrix(1)#
+UU <- matrix(0)#
+QQ <- matrix("q")#
+#
+ZZ <- matrix(1)#
+AA <- matrix(0)#
+RR <- matrix("r")#
+#
+mod.list <- list(B=BB, U=UU, Q=QQ, Z=ZZ, A=AA, R=RR)#
+#
+MARSS(yy, model=mod.list)
+m1 <- MARSS(yy, model=mod.list)#
+#
+plot.ts(yy)
+plot.ts(t(yy))
+plot.ts(t(yy), type="o")
+lines(m1$states, col="blue")
+yy <- Nile
+plot.ts(yy, type="o", pch=16)
+lines(m1$states)
+m1$states
+lines(t(m1$states))
+?Nile
+names(yy)
+attributes(yy)
+tsp(yy)
+seq(tsp(yy))
+lines(seq(tsp(yy)[1],tsp(yy)[2]),t(m1$states))
+plot.ts(yy, type="o", pch=16, ylab="Flow")#
+#
+lines(seq(tsp(yy)[1],tsp(yy)[2]),t(m1$states), col="blue")
+lines(seq(tsp(yy)[1],tsp(yy)[2]),t(m1$states), col="blue", lwd=2)
+m1$statesse
+m1$statesSE
+names(m1)
+m1$states.se
+m1up95 <- m1$states + 1.96*m1$states.se#
+m1lo95 <- m1$states - 1.96*m1$states.se
+lines(seq(tsp(yy)[1],tsp(yy)[2]),t(m1up95), col="blue", lty="dashed")
+matlines(seq(tsp(yy)[1],tsp(yy)[2]),t(m1up95), col="blue", lty="dashed")
+plot.ts(yy, type="o", pch=16, ylab="Nile River flow", xlb="Year")#
+#
+lines(seq(tsp(yy)[1],tsp(yy)[2]),t(m1$states), col="blue", lwd=2)#
+lines(seq(tsp(yy)[1],tsp(yy)[2]),t(m1lo95), col="blue", lty="dashed")#
+lines(seq(tsp(yy)[1],tsp(yy)[2]),t(m1up95), col="blue", lty="dashed")
+plot.ts(yy, type="o", pch=16, ylab="Flow of the Nile River", xlb="Year")#
+#
+lines(seq(tsp(yy)[1],tsp(yy)[2]),t(m1$states), col="blue", lwd=2)#
+lines(seq(tsp(yy)[1],tsp(yy)[2]),t(m1lo95), col="blue", lty="dashed")#
+lines(seq(tsp(yy)[1],tsp(yy)[2]),t(m1up95), col="blue", lty="dashed")
+dev.new(height=3, width=5.5)#
+#
+plot.ts(yy, type="o", pch=16, ylab="Flow of the Nile River", xlb="Year")#
+#
+lines(seq(tsp(yy)[1],tsp(yy)[2]),t(m1$states), col="blue", lwd=2)#
+lines(seq(tsp(yy)[1],tsp(yy)[2]),t(m1lo95), col="blue", lty="dashed")#
+lines(seq(tsp(yy)[1],tsp(yy)[2]),t(m1up95), col="blue", lty="dashed")
+par(mai=c(0.8,0.8,0.1,0.1), omi=c(0,0.2,0.1,0.2))#
+#
+plot.ts(yy, type="o", pch=16, ylab="Flow of the Nile River", xlb="Year")#
+#
+lines(seq(tsp(yy)[1],tsp(yy)[2]),t(m1$states), col="blue", lwd=2)#
+lines(seq(tsp(yy)[1],tsp(yy)[2]),t(m1lo95), col="blue", lty="dashed")#
+lines(seq(tsp(yy)[1],tsp(yy)[2]),t(m1up95), col="blue", lty="dashed")
+png("Nile_DLM.png", height=3.3, width=5.5, units="in", res=300)
+par(mai=c(0.8,0.8,0.1,0.1), omi=c(0,0.2,0.1,0.2))#
+#
+plot.ts(yy, type="o", pch=16, ylab="Flow of the Nile River", xlb="Year")#
+#
+lines(seq(tsp(yy)[1],tsp(yy)[2]),t(m1$states), col="blue", lwd=2)#
+lines(seq(tsp(yy)[1],tsp(yy)[2]),t(m1lo95), col="blue", lty="dashed")#
+lines(seq(tsp(yy)[1],tsp(yy)[2]),t(m1up95), col="blue", lty="dashed")
+dev.off()
+png("Nile_DLM.png", height=3.3, width=5.5, units="in", res=300)#
+#
+par(mai=c(0.8,0.8,0.1,0.1), omi=c(0,0.2,0.1,0.2))#
+#
+plot.ts(yy, type="o", pch=16, ylab="Flow of the Nile River", xlab="Year")#
+#
+lines(seq(tsp(yy)[1],tsp(yy)[2]),t(m1$states), col="blue", lwd=2)#
+lines(seq(tsp(yy)[1],tsp(yy)[2]),t(m1lo95), col="blue", lty="dashed")#
+lines(seq(tsp(yy)[1],tsp(yy)[2]),t(m1up95), col="blue", lty="dashed")
+dev.off()
+getwd()
+BB <- matrix(c(1,0,1,1),2,2)#
+UU <- matrix(0,2,1)#
+QQ <- matrix(list(0),2,2)#
+diag(QQ) <- c("q.lvl","q.tnd")
+BB <- matrix(c(1,0,1,1),2,2)#
+UU <- matrix(0,2,1)#
+QQ <- matrix(list(0),2,2)#
+diag(QQ) <- c("q.lvl","q.tnd")#
+#
+ZZ <- matrix(c(1,0),1,2)#
+AA <- matrix(0)#
+RR <- matrix("r")#
+#
+mod.list <- list(B=BB, U=UU, Q=QQ, Z=ZZ, A=AA, R=RR)
+mod.list
+# trying stochstic trend/bias#
+#
+BB <- matrix(c(1,0,1,1),2,2)#
+UU <- matrix(0,2,1)#
+QQ <- matrix(list(0),2,2)#
+diag(QQ) <- c("q.lvl","q.tnd")#
+#
+ZZ <- matrix(c(1,0),1,2)#
+AA <- matrix(0)#
+RR <- matrix("r")#
+#
+mod.list <- list(B=BB, U=UU, Q=QQ, Z=ZZ, A=AA, R=RR)#
+#
+m2 <- MARSS(matrix(yy, nrow=1), model=mod.list)#
+#
+m2up95 <- m2$states + 1.96*m2$states.se#
+m2lo95 <- m2$states - 1.96*m2$states.se#
+#
+dev.new(height=3.3, width=5.5)#
+#
+# png("Nile_DLM.png", height=3.3, width=5.5, units="in", res=300)#
+#
+par(mai=c(0.8,0.8,0.1,0.1), omi=c(0,0.2,0.1,0.2))#
+#
+plot.ts(yy, type="o", pch=16, ylab="Flow of the Nile River", xlab="Year")#
+#
+lines(seq(tsp(yy)[1],tsp(yy)[2]),t(m2$states), col="blue", lwd=2)#
+lines(seq(tsp(yy)[1],tsp(yy)[2]),t(m2lo95), col="blue", lty="dashed")#
+lines(seq(tsp(yy)[1],tsp(yy)[2]),t(m2up95), col="blue", lty="dashed")
+# only need starting values for regr parameters#
+inits.list = list(x0=matrix(c(0, 0), nrow=2))#
+#
+m2 <- MARSS(matrix(yy, nrow=1), model=mod.list, inits=inits.list)
+m2 <- MARSS(matrix((yy-mean(yy))/sqrt(var(yy)), nrow=1), model=mod.list, inits=inits.list)
+m2$states
+BB <- matrix(c(1,0,1,1),2,2)#
+UU <- matrix(0,2,1)#
+QQ <- matrix(list(0),2,2)#
+diag(QQ) <- c("q.lvl","q.tnd")#
+diag(QQ) <- c("q","q")#
+#
+ZZ <- matrix(c(1,0),1,2)#
+AA <- matrix(0)#
+RR <- matrix("r")#
+#
+mod.list <- list(B=BB, U=UU, Q=QQ, Z=ZZ, A=AA, R=RR)#
+#
+# only need starting values for regr parameters#
+inits.list = list(x0=matrix(c(0, 0), nrow=2))#
+#
+m2 <- MARSS(matrix((yy-mean(yy))/sqrt(var(yy)), nrow=1), model=mod.list, inits=inits.list)
+con.list <- list(maxit=1500)#
+#
+mod.list <- list(B=BB, U=UU, Q=QQ, Z=ZZ, A=AA, R=RR)#
+#
+# only need starting values for regr parameters#
+inits.list = list(x0=matrix(c(0, 0), nrow=2))#
+#
+m2 <- MARSS(matrix((yy-mean(yy))/sqrt(var(yy)), nrow=1), model=mod.list, inits=inits.list)
+BB <- matrix(c(1,0,1,1),2,2)#
+UU <- matrix(0,2,1)#
+QQ <- matrix(list(0),2,2)#
+diag(QQ) <- c("q.lvl","q.tnd")#
+diag(QQ) <- c("q","q")#
+#
+ZZ <- matrix(c(1,0),1,2)#
+AA <- matrix(0)#
+RR <- matrix("r")#
+#
+con.list <- list(maxit=1500)#
+#
+mod.list <- list(B=BB, U=UU, Q=QQ, Z=ZZ, A=AA, R=RR)#
+#
+# only need starting values for regr parameters#
+inits.list = list(x0=matrix(c(0, 0), nrow=2))#
+#
+dat <- matrix((yy-mean(yy))/sqrt(var(yy)), nrow=1)#
+m2 <- MARSS(dat, model=mod.list, control=con.list, inits=inits.list)
+m2$states
+library(MARSS)
+?MARSSkfss
+Y1 = log(lakeWAplanktonRaw[,20])#
+Y2 = log(lakeWAplanktonRaw[,13])#
+N = length(Y1)#
+library(R2jags)#
+jagsscript = cat("#
+model {	#
+	# time varying level parameter#
+	tauQ ~ dgamma(0.001,0.001);#
+	tauR ~ dgamma(0.001,0.001);#
+	sigmaQ <- 1/sqrt(tauQ);#
+	sigmaR <- 1/sqrt(tauR);		#
+	alpha[1] ~ dnorm(0,0.01);#
+	for(i in 2:N) {#
+		alpha[i] ~ dnorm(alpha[i-1],tauQ);#
+	}#
+	for(i in 1:N) {#
+		Y[i] ~ dnorm(alpha[i], tauR);#
+	}#
+}#
+",file="univariateDLM.txt")#
+model.loc=("univariateDLM.txt")#
+  mcmc.chainLength <- as.integer(25000)  # post-burn #
+  mcmc.burn <- as.integer(20000) #
+  mcmc.thin = 10#
+  mcmc.chains = 4#
+  jags.params = c("alpha","sigmaQ","sigmaR")#
+  jags.data = list("N"=N,"Y"=Y)#
+  # run univariate models for each time series#
+  Y = Y1 # rotifers#
+  jags.model = jags(jags.data,parameters.to.save = jags.params,model.file=model.loc, n.chains = mcmc.chains, n.burnin = mcmc.burn, n.thin = mcmc.thin, n.iter = mcmc.chainLength, DIC = TRUE) #
+  attach.jags(jags.model)#
+  lowerCI = apply(alpha,2,quantile,0.025)#
+  upperCI = apply(alpha,2,quantile,0.975)#
+  means = apply(alpha,2,mean)#
+  plot(means, ylim=range(c(lowerCI,upperCI)), type="l",lwd=1,col="blue",main="Non-colonial rotifers",ylab="")#
+  lines(lowerCI)#
+  lines(upperCI)#
+  points(Y,col="red",cex=0.5)#
+  plot(means,Y, xlab = "Fitted values",ylab="Predicted values",main="Non-colonial rotifers")#
+  abline(0,1,col="red")
+library(MARSS)#
+Y1 = log(lakeWAplanktonRaw[,20])#
+Y2 = log(lakeWAplanktonRaw[,13])#
+N = length(Y1)
+jagsscript = cat("#
+model {	#
+	# time varying level parameter#
+	tauQ ~ dgamma(0.001,0.001);#
+	tauR ~ dgamma(0.001,0.001);#
+	sigmaQ <- 1/sqrt(tauQ);#
+	sigmaR <- 1/sqrt(tauR);		#
+	alpha[1] ~ dnorm(0,0.01);#
+	for(i in 2:N) {#
+		alpha[i] ~ dnorm(alpha[i-1],tauQ);#
+	}#
+	for(i in 1:N) {#
+		Y[i] ~ dnorm(alpha[i], tauR);#
+	}#
+}#
+",file="univariateDLM.txt")#
+model.loc=("univariateDLM.txt")#
+  mcmc.chainLength <- as.integer(25000)  # post-burn #
+  mcmc.burn <- as.integer(20000) #
+  mcmc.thin = 10#
+  mcmc.chains = 4#
+  jags.params = c("alpha","sigmaQ","sigmaR")#
+  jags.data = list("N"=N,"Y"=Y)#
+  # run univariate models for each time series#
+  Y = Y1 # rotifers#
+  jags.model = jags(jags.data,parameters.to.save = jags.params,model.file=model.loc, n.chains = mcmc.chains, n.burnin = mcmc.burn, n.thin = mcmc.thin, n.iter = mcmc.chainLength, DIC = TRUE) #
+  attach.jags(jags.model)#
+  lowerCI = apply(alpha,2,quantile,0.025)#
+  upperCI = apply(alpha,2,quantile,0.975)#
+  means = apply(alpha,2,mean)#
+  plot(means, ylim=range(c(lowerCI,upperCI)), type="l",lwd=1,col="blue",main="Non-colonial rotifers",ylab="")#
+  lines(lowerCI)#
+  lines(upperCI)#
+  points(Y,col="red",cex=0.5)#
+  plot(means,Y, xlab = "Fitted values",ylab="Predicted values",main="Non-colonial rotifers")#
+  abline(0,1,col="red")
+jagsscript = cat("#
+model {	#
+	# time varying level parameter#
+	tauQ ~ dgamma(0.001,0.001);#
+	tauR ~ dgamma(0.001,0.001);#
+	sigmaQ <- 1/sqrt(tauQ);#
+	sigmaR <- 1/sqrt(tauR);		#
+	alpha[1] ~ dnorm(0,0.01);#
+	for(i in 2:N) {#
+		alpha[i] ~ dnorm(alpha[i-1],tauQ);#
+	}#
+	for(i in 1:N) {#
+		Y[i] ~ dnorm(alpha[i], tauR);#
+	}#
+}#
+",file="univariateDLM.txt")
+model.loc=("univariateDLM.txt")
+mcmc.chainLength <- as.integer(25000)  # post-burn #
+  mcmc.burn <- as.integer(20000) #
+  mcmc.thin = 10#
+  mcmc.chains = 4#
+  jags.params = c("alpha","sigmaQ","sigmaR")#
+  jags.data = list("N"=N,"Y"=Y)#
+  # run univariate models for each time series#
+  Y = Y1 # rotifers
+jags.model = jags(jags.data,parameters.to.save = jags.params,model.file=model.loc, n.chains = mcmc.chains, n.burnin = mcmc.burn, n.thin = mcmc.thin, n.iter = mcmc.chainLength, DIC = TRUE)
+attach.jags(jags.model)#
+  lowerCI = apply(alpha,2,quantile,0.025)#
+  upperCI = apply(alpha,2,quantile,0.975)#
+  means = apply(alpha,2,mean)
+plot(means, ylim=range(c(lowerCI,upperCI)), type="l",lwd=1,col="blue",main="Non-colonial rotifers",ylab="")#
+  lines(lowerCI)#
+  lines(upperCI)#
+  points(Y,col="red",cex=0.5)#
+  plot(means,Y, xlab = "Fitted values",ylab="Predicted values",main="Non-colonial rotifers")#
+  abline(0,1,col="red")
+hist(sigmaQ)
+plot(means, ylim=range(c(lowerCI,upperCI)), type="l",lwd=1,col="blue",main="Non-colonial rotifers",ylab="")#
+  lines(lowerCI)#
+  lines(upperCI)
+dim(alpha)
+xx <-  c(rep(0,10),1,rep(0,9))
+plot.ts(xx)
+plot.ts(xx, ylab="Indicator variable", type="o", pch=16)
+plot.ts(xx, ylab="Indicator variable", type="o", pch=16, yaxt="n")#
+#
+axis(1, at=c(0,1))
+axis(2, at=c(0,1))
+axis(2, at=c(0,1), las=1)
+tstar <- 11#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)
+par(mai=c(0.7,0.7,0.1,0.1), omi=c(0,0,0,0))#
+#
+plot.ts(xx, ylab="Indicator variable", type="o", pch=16, yaxt="n")#
+#
+axis(2, at=c(0,1), las=1)#
+#
+tstar <- 11#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)
+dev.new(height=4, width=7)
+par(mai=c(0.9,0.9,0.1,0.1), omi=c(0,0,0,0))#
+#
+plot.ts(xx, ylab="Indicator variable", type="o", pch=16, yaxt="n")#
+#
+axis(2, at=c(0,1), las=1)#
+#
+tstar <- 11#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)
+getwd()
+pdf("indicator_examples.pdf", height=4, width=7)#
+#
+par(mai=c(0.9,0.9,0.1,0.1), omi=c(0,0,0,0))#
+#
+plot.ts(xx, ylab="Indicator variable", type="o", pch=16, yaxt="n")#
+#
+axis(2, at=c(0,1), las=1)#
+#
+tstar <- 11#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)#
+#
+dev.off()
+x2 <-  c(rep(0,10),rep(1,10))#
+#
+plot.ts(x2, ylab="Indicator variable", type="o", pch=16, yaxt="n")#
+#
+axis(2, at=c(0,1), las=1)#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)
+tstar <- 11#
+#
+x1 <-  c(rep(0,10),1,rep(0,9))#
+#
+pdf("indicator_examples.pdf", height=3, width=7)#
+#
+par(mai=c(0.9,0.9,0.1,0.1), omi=c(0,0,0,0))#
+#
+plot.ts(x1, ylab="Indicator variable", type="o", pch=16, yaxt="n")#
+#
+axis(2, at=c(0,1), las=1)#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)#
+x2 <-  c(rep(0,10),rep(1,10))#
+#
+plot.ts(x2, ylab="Indicator variable", type="o", pch=16, yaxt="n")#
+#
+axis(2, at=c(0,1), las=1)#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)#
+dev.off()
+x3 <- c(rep(0,10),2,rep(0,9))#
+#
+plot.ts(x3, ylab="Advertising expense (1000s USD)", type="o", pch=16, yaxt="n")#
+#
+axis(2, at=c(0,1), labels=c(0,1000))#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)
+x3 <- c(rep(0,10),0.954,rep(0,9))#
+#
+plot.ts(x3, ylab="Advertising expense (1000s USD)", type="o", pch=16, yaxt="n")#
+#
+axis(2, at=c(0,1), labels=c(0,1000))#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)
+x3 <- c(rep(0,10),0.954,rep(0,9))#
+#
+plot.ts(x3, ylab="Advertising expense (1000s USD)", type="o", pch=16, yaxt="n")
+par()$usr
+axis(2, at=c(0,1), labels=c(0,1000))
+axis(2, at=c(0,1), labels=c(0,1))
+plot.ts(x3, ylab="Advertising expense (1000s USD)", type="o", pch=16, yaxt="n", ylim=c(0,1))#
+#
+axis(2, at=c(0,1), labels=c(0,1))
+x3 <- c(rep(0,10),0.954,rep(0,9))#
+#
+plot.ts(x3, ylab="Advertising expense (1000s USD)", type="o", pch=16, yaxt="n", ylim=c(0,1))#
+#
+axis(2, at=c(0,1), labels=c(0,1000))
+x3 <- c(rep(0,10),0.94,rep(0,9))#
+#
+plot.ts(x3, ylab="Advertising expense (1000s USD)", type="o", pch=16, yaxt="n", ylim=c(0,1))#
+#
+axis(2, at=c(0,1), labels=c(0,1000))#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)
+x4 <- c(rep(0,10),0.94,0.87,0.82,rep(0,7))#
+#
+plot.ts(x4, ylab="Advertising expense (1000s USD)", type="o", pch=16, yaxt="n", ylim=c(0,1))#
+#
+axis(2, at=c(0,1), labels=c(0,1000))#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)
+x4 <- c(rep(0,10),0.94,0.87,0.82,0.8,rep(0,6))#
+#
+plot.ts(x4, ylab="Advertising expense (1000s USD)", type="o", pch=16, yaxt="n", ylim=c(0,1))#
+#
+axis(2, at=c(0,1), labels=c(0,1000))#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)
+x3 <-  c(rep(0,10),1,0,0,-1,0,1,0,0,0))#
+#
+plot.ts(x3, ylab="Indicator variable", type="o", pch=16, yaxt="n", ylim=c(-1,1))#
+#
+axis(2, at=c(-1,0,1), las=1)#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)
+x3 <-  c(rep(0,10),1,0,0,-1,0,1,0,0,0)#
+#
+plot.ts(x3, ylab="Indicator variable", type="o", pch=16, yaxt="n", ylim=c(-1,1))#
+#
+axis(2, at=c(-1,0,1), las=1)#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)
+arrows(x0=c(11,14,16),y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)
+plot.ts(x3, ylab="Indicator variable", type="o", pch=16, yaxt="n", ylim=c(-1,1))#
+#
+axis(2, at=c(-1,0,1), las=1)#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)
+arrows(x0=14,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(14,par()$usr[3]-aB,expression((italic(Off))),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)
+plot.ts(x3, ylab="Indicator variable", type="o", pch=16, yaxt="n", ylim=c(-1,1))#
+#
+axis(2, at=c(-1,0,1), las=1)#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)#
+arrows(x0=14,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(14,par()$usr[3]-aB,"Off"),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)#
+arrows(x0=16,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(16,par()$usr[3]-aB,"On"),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)
+text(14,par()$usr[3]-aB,"Off",#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)#
+arrows(x0=16,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(16,par()$usr[3]-aB,"On",#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)
+tstar <- 11#
+#
+x1 <-  c(rep(0,10),1,rep(0,9))#
+#
+pdf("indicator_examples.pdf", height=3, width=7)#
+#
+par(mai=c(0.9,0.9,0.1,0.1), omi=c(0,0,0,0))#
+#
+plot.ts(x1, ylab="Indicator variable", type="o", pch=16, yaxt="n")#
+#
+axis(2, at=c(0,1), las=1)#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)#
+x2 <-  c(rep(0,10),rep(1,10))#
+#
+plot.ts(x2, ylab="Indicator variable", type="o", pch=16, yaxt="n")#
+#
+axis(2, at=c(0,1), las=1)#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)#
+x3 <-  c(rep(0,10),1,0,0,-1,0,1,0,0,0)#
+#
+plot.ts(x3, ylab="Indicator variable", type="o", pch=16, yaxt="n", ylim=c(-1,1))#
+#
+axis(2, at=c(-1,0,1), las=1)#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)#
+arrows(x0=14,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(14,par()$usr[3]-aB,"Off",#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)#
+arrows(x0=16,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(16,par()$usr[3]-aB,"On",#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)#
+x4 <- c(rep(0,10),0.94,rep(0,9))#
+#
+plot.ts(x4, ylab="Advertising expense (1000s USD)", type="o", pch=16, yaxt="n", ylim=c(0,1))#
+#
+axis(2, at=c(0,1), labels=c(0,1000))#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)#
+x5 <- c(rep(0,10),0.94,0.87,0.82,0.8,rep(0,6))#
+#
+plot.ts(x5, ylab="Advertising expense (1000s USD)", type="o", pch=16, yaxt="n", ylim=c(0,1))#
+#
+axis(2, at=c(0,1), labels=c(0,1000))#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)#
+dev.off()
+tstar <- 11#
+#
+x1 <-  c(rep(0,10),1,rep(0,9))#
+#
+pdf("indicator_examples.pdf", height=3, width=7)#
+#
+par(mai=c(0.9,0.9,0.1,0.1), omi=c(0,0,0,0))#
+#
+plot.ts(x1, ylab="Indicator variable", type="o", pch=16, yaxt="n")#
+#
+axis(2, at=c(0,1), las=1)#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)#
+x2 <-  c(rep(0,10),rep(1,10))#
+#
+plot.ts(x2, ylab="Indicator variable", type="o", pch=16, yaxt="n")#
+#
+axis(2, at=c(0,1), las=1)#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)#
+x3 <-  c(rep(0,10),1,0,0,-1,0,1,0,0,0)#
+#
+plot.ts(x3, ylab="Indicator variable", type="o", pch=16, yaxt="n", ylim=c(-1,1))#
+#
+axis(2, at=c(-1,0,1), las=1)#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)#
+arrows(x0=14,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(14,par()$usr[3]-aB,"Off",#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)#
+arrows(x0=16,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(16,par()$usr[3]-aB,"On",#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)#
+x4 <- c(rep(0,10),0.94,rep(0,9))#
+#
+plot.ts(x4, ylab="Expense (1000s USD)", type="o", pch=16, yaxt="n", ylim=c(0,1))#
+#
+axis(2, at=c(0,1), labels=c(0,1000))#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)#
+x5 <- c(rep(0,10),0.94,0.87,0.82,0.8,rep(0,6))#
+#
+plot.ts(x5, ylab="Expense (1000s USD)", type="o", pch=16, yaxt="n", ylim=c(0,1))#
+#
+axis(2, at=c(0,1), labels=c(0,1000))#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)#
+dev.off()
+tstar <- 11#
+#
+x1 <-  c(rep(0,10),1,rep(0,9))
+par(mai=c(0.9,0.9,0.1,0.1), omi=c(0,0,0,0))#
+#
+plot.ts(x1, ylab="Indicator variable", type="o", pch=16, yaxt="n")#
+#
+axis(2, at=c(0,1), las=1)#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)
+x2 <-  c(rep(0,10),rep(1,10))#
+#
+plot.ts(x2, ylab="Indicator variable", type="o", pch=16, yaxt="n")
+axis(2, at=c(0,1), las=1)#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)#
+x3 <-  c(rep(0,10),1,0,0,-1,0,1,0,0,0)#
+#
+plot.ts(x3, ylab="Indicator variable", type="o", pch=16, yaxt="n", ylim=c(-1,1))
+axis(2, at=c(-1,0,1), las=1)
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)#
+arrows(x0=14,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(14,par()$usr[3]-aB,"Off",#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)#
+arrows(x0=16,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(16,par()$usr[3]-aB,"On",#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)#
+x4 <- c(rep(0,10),0.94,rep(0,9))
+x4 <- c(rep(0,10),0.94,rep(0,9))#
+#
+plot.ts(x4, ylab="Expense (1000s USD)", type="o", pch=16, yaxt="n", ylim=c(0,1))#
+#
+axis(2, at=c(0,1), labels=c(0,1000))#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)
+x5 <- c(rep(0,10),0.94,0.87,0.82,0.8,rep(0,6))#
+#
+plot.ts(x5, ylab="Expense (1000s USD)", type="o", pch=16, yaxt="n", ylim=c(0,1))#
+#
+axis(2, at=c(0,1), labels=c(0,1000))#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)
+par(mai=c(0.9,0.9,0.1,0.1), omi=c(0,0,0,0))#
+#
+plot.ts(x1, ylab="Indicator variable", type="o", pch=16, yaxt="n")#
+#
+axis(2, at=c(0,1), las=1)#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)
+x3 <-  c(rep(0,10),1,0,0,-1,0,1,0,0,0)#
+#
+plot.ts(x3, ylab="Indicator variable", type="o", pch=16, yaxt="n", ylim=c(-1,1))#
+#
+axis(2, at=c(-1,0,1), las=1)#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)#
+arrows(x0=14,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(14,par()$usr[3]-aB,"Off",#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)#
+arrows(x0=16,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(16,par()$usr[3]-aB,"On",#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)
+dev.new(height=3, width=7)#
+#
+par(mai=c(0.9,0.9,0.1,0.1), omi=c(0,0,0,0))
+x1 <- cumsum(rnorm(15))#
+#
+plot.ts(x1, ylab="Indicator variable", type="o", pch=16, yaxt="n")
+set.seed(123)#
+#
+x1 <- cumsum(rnorm(15))#
+#
+plot.ts(x1, ylab="Indicator variable", type="o", pch=16, yaxt="n")
+set.seed(666)#
+#
+x1 <- cumsum(rnorm(15))#
+#
+plot.ts(x1, ylab="Indicator variable", type="o", pch=16, yaxt="n")
+set.seed(666)#
+#
+x1 <- cumsum(rnorm(20))#
+#
+plot.ts(x1, ylab="Indicator variable", type="o", pch=16, yaxt="n")
+set.seed(666)#
+#
+x1 <- cumsum(rnorm(20)) + 5#
+#
+plot.ts(x1, ylab="Indicator variable", type="o", pch=16)
+plot.ts(x1, ylab="Indicator variable", type="o", pch=16, las=1)
+plot.ts(x1, ylab="Sales index", type="o", pch=16, las=1, col="darkblue")
+set.seed(666)#
+#
+x1 <- cumsum(rnorm(20)) + 5#
+#
+x2 <- x1 + c(rep(0,10), rep(1,10))#
+#
+plot.ts(x2, ylab="Sales index", type="o", pch=16, las=1, col="darkblue")
+set.seed(666)#
+#
+x1 <- cumsum(rnorm(20)) + 5#
+#
+x2 <- x1 + c(rep(0,11), rep(1,9))#
+#
+plot.ts(x2, ylab="Sales index", type="o", pch=16, las=1, col="darkblue")
+plot.ts(x1, ylab="Sales index", type="o", pch=16, las=1, col="darkblue")
+set.seed(666)#
+#
+x1 <- cumsum(rnorm(20)) + 5#
+#
+x2 <- x1 + c(rep(0,11), rep(1,9))#
+#
+plot.ts(x2, ylab="Sales index", type="o", pch=16, las=1, col="darkblue")#
+lines.ts(x1, ylab="Sales index", type="o", pch=16, las=1, col="darkblue")
+set.seed(666)#
+#
+x1 <- cumsum(rnorm(20)) + 5#
+#
+dd <- c(rep(0,11), rep(1,9))#
+x2 <- x1 + dd#
+#
+plot.ts(x2, ylab="Sales index", type="o", pch=16, las=1, col="darkblue")
+lines(dd[12:20], x1[12:20], type="o", pch=16, las=1, col="gray")
+plot.ts(x2, ylab="Sales index", type="o", pch=16, las=1, col="darkblue")#
+lines(12:20, x1[12:20], type="o", pch=16, las=1, col="gray")
+set.seed(666)#
+#
+x1 <- cumsum(rnorm(20)) + 5#
+#
+dd <- c(rep(0,11), rep(1,9))#
+x2 <- x1 + dd#
+#
+plot.ts(x1, ylab="Sales index", type="o", pch=16, las=1, col="darkblue")#
+lines(seq(20), x2, type="o", pch=16, las=1, col="gray")
+plot.ts(x1, ylab="Sales index", type="o", pch=16, las=1, col="gray")#
+lines(seq(20), x2, type="o", pch=16, las=1, col="darkblue")
+set.seed(666)#
+#
+x1 <- cumsum(rnorm(20)) + 5#
+#
+dd <- c(rep(0,11), rep(1.5,9))#
+x2 <- x1 + dd#
+#
+plot.ts(x1, ylab="Sales index", type="o", pch=16, las=1, col="gray")#
+lines(seq(20), x2, type="o", pch=16, las=1, col="darkblue")
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.2, col="red", pos=1, xpd=TRUE)
+tstar <- 11#
+#
+par(mai=c(0.9,0.9,0.1,0.1), omi=c(0,0,0,0))#
+#
+set.seed(666)#
+#
+x1 <- cumsum(rnorm(20)) + 5#
+#
+dd <- c(rep(0,11), rep(1.5,9))#
+x2 <- x1 + dd#
+#
+plot.ts(x1, type="o", pch=16, las=1, col="darkgray",#
+        xlab="", ylab="", cex.axis=1.2)#
+lines(seq(20), x2, type="o", pch=16, las=1, col="darkblue")#
+mtext(side=1, "Time", line=3, cex=1.5)#
+mtext(side=2, "Sales index", line=3, cex=1.5)#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.3, col="red", pos=1, xpd=TRUE)
+segments(11, x1[12], 11, x2[12], col="darkblue")
+par(mai=c(0.9,0.9,0.1,0.1), omi=c(0,0,0,0))#
+#
+set.seed(666)#
+#
+x1 <- cumsum(rnorm(20)) + 5#
+#
+dd <- c(rep(0,11), rep(1.5,9))#
+x2 <- x1 + dd#
+#
+plot.ts(x1, type="o", pch=16, las=1, col="darkgray",#
+        xlab="", ylab="", cex.axis=1.2)#
+lines(seq(20), x2, type="o", pch=16, las=1, col="darkblue")#
+mtext(side=1, "Time", line=3, cex=1.5)#
+mtext(side=2, "Sales index", line=3, cex=1.5)#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.3, col="red", pos=1, xpd=TRUE)#
+#
+segments(12, x1[12], 11, x2[12], col="darkblue")
+plot.ts(x1, type="o", pch=16, las=1, col="darkgray",#
+        xlab="", ylab="", cex.axis=1.2)#
+lines(seq(20), x2, type="o", pch=16, las=1, col="darkblue")#
+mtext(side=1, "Time", line=3, cex=1.5)#
+mtext(side=2, "Sales index", line=3, cex=1.5)#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.3, col="red", pos=1, xpd=TRUE)#
+#
+segments(12, x1[12], 12, x2[12], col="darkblue")
+plot.ts(x1, type="o", pch=16, las=1, col="darkgray",#
+        xlab="", ylab="", cex.axis=1.2)#
+lines(seq(20), x2, type="o", pch=16, las=1, col="darkblue")#
+mtext(side=1, "Time", line=3, cex=1.5)#
+mtext(side=2, "Sales index", line=3, cex=1.5)#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.3, col="red", pos=1, xpd=TRUE)#
+#
+segments(12, x1[12], 12, x2[12], col="orange", lty="dashed")
+segments(12, x1[12], 12, x2[12], col="darkorange", lty="dashed")
+text(tstar, (x1[12]+x2[12])/2, expression(delta),#
+	 cex=1.3, col="darkorange", pos=4)
+text(tstar, (x1[12]+x2[12])/2, expression(delta),#
+	 cex=1.3, col="darkorange", pos=2)
+par(mai=c(0.9,0.9,0.1,0.1), omi=c(0,0,0,0))#
+#
+set.seed(666)#
+#
+x1 <- cumsum(rnorm(20)) + 5#
+#
+dd <- c(rep(0,11), rep(1.5,9))#
+x2 <- x1 + dd#
+#
+plot.ts(x1, type="o", pch=16, las=1, col="darkgray",#
+        xlab="", ylab="", cex.axis=1.2)#
+#
+segments(tstar+1, x1[tstar+1], tstar+1, x2[tstar+1], col="darkorange", lty="dashed", lwd=1.5)#
+#
+text(tstar+1, (x1[tstar+1]+x2[tstar+1])/2, expression(delta),#
+	 cex=1.3, col="darkorange", pos=4)#
+#
+lines(seq(20), x2, type="o", pch=16, las=1, col="darkblue")#
+mtext(side=1, "Time", line=3, cex=1.5)#
+mtext(side=2, "Sales index", line=3, cex=1.5)#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.3, col="red", pos=1, xpd=TRUE)
+text(tstar+1, (x1[tstar+1]+x2[tstar+1])/1.8, expression(delta),#
+	 cex=1.3, col="darkorange", pos=4)
+plot.ts(x1, type="o", pch=16, las=1, col="darkgray",#
+        xlab="", ylab="", cex.axis=1.2)#
+#
+segments(tstar+1, x1[tstar+1], tstar+1, x2[tstar+1], col="darkorange", lty="dashed", lwd=1.5)#
+#
+text(tstar+1, (x1[tstar+1]+x2[tstar+1])/1.9, expression(delta),#
+	 cex=1.3, col="darkorange", pos=4)#
+#
+lines(seq(20), x2, type="o", pch=16, las=1, col="darkblue")#
+mtext(side=1, "Time", line=3, cex=1.5)#
+mtext(side=2, "Sales index", line=3, cex=1.5)#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.3, col="red", pos=1, xpd=TRUE)
+plot.ts(x1, type="o", pch=16, las=1, col="darkgray",#
+        xlab="", ylab="", cex.axis=1.2)#
+#
+segments(tstar+1, x1[tstar+1], tstar+1, x2[tstar+1], col="darkorange", lty="dashed", lwd=1.5)#
+#
+text(tstar+1, (x1[tstar+1]+x2[tstar+1])/1.9, expression(delta),#
+	 cex=1.4, col="darkorange", pos=4)#
+#
+lines(seq(20), x2, type="o", pch=16, las=1, col="darkblue")#
+mtext(side=1, "Time", line=3, cex=1.5)#
+mtext(side=2, "Sales index", line=3, cex=1.5)#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.4, col="red", pos=1, xpd=TRUE)
+plot.ts(x1, type="o", pch=16, las=1, col="darkgray",#
+        xlab="", ylab="", cex.axis=1.2)#
+#
+segments(tstar+1, x1[tstar+1], tstar+1, x2[tstar+1], col="darkorange", lty="dashed", lwd=1.5)#
+#
+text(tstar+1, (x1[tstar+1]+x2[tstar+1])/1.9, expression(delta),#
+	 cex=1.5, col="darkorange", pos=4)#
+#
+lines(seq(20), x2, type="o", pch=16, las=1, col="darkblue")#
+mtext(side=1, "Time", line=3, cex=1.5)#
+mtext(side=2, "Sales index", line=3, cex=1.5)#
+#
+scl <- 0.07#
+aB <- (par()$usr[4] - par()$usr[3])*scl#
+arrows(x0=tstar,y0=par()$usr[3]-aB,y1=par()$usr[3], length=0.1, col="red",xpd=TRUE)#
+text(tstar,par()$usr[3]-aB,expression(paste(italic(t),"*")),#
+	 cex=1.5, col="red", pos=1, xpd=TRUE)
+lines(seq(20), x2, type="o", pch=16, las=1, col="slateblue")#
+mtext(side=1, "Time", line=3, cex=1.5)#
+mtext(side=2, "Sales index", line=3, cex=1.5)
+tstar <- 11#
+#
+par(mai=c(0.9,0.9,0.1,0.1), omi=c(0,0,0,0))#
+#
+set.seed(666)#
+#
+x1 <- cumsum(rnorm(20)) + 5#
+#
+dd <- c(rep(0,11), rep(1.5,9))#
+x2 <- x1 + dd#
+#
+plot.ts(x1, type="o", pch=16, las=1, col="darkgray",#
+        xlab="", ylab="", cex.axis=1.2)#
+#
+segments(tstar+1, x1[tstar+1], tstar+1, x2[tstar+1], col="darkorange", lty="dashed", lwd=1.5)#
+#
+text(tstar+1, (x1[tstar+1]+x2[tstar+1])/1.9, expression(delta),#
+	 cex=1.5, col="darkorange", pos=4)#
+#
+lines(seq(20), x2, type="o", pch=16, las=1, col="slateblue")#
+mtext(side=1, "Time", line=3, cex=1.5)#
+mtext(side=2, "Sales index", line=3, cex=1.5)
+colorstrip <- function(color="blue") {#
+	color <- rev(colors()[grep(color, colors())])#
+	dev.new(height=length(color)/6, width=2)#
+	par(mai=rep(0,4), omi=rep(0.1,4))#
+	plot(1.1, 1, col=color[1], pch=15, cex=2.1,#
+		 xaxt="n", yaxt="n", xlim=c(1,2), ylim=c(1,length(color)),#
+		 xlab="", ylab="", bty="n")#
+	text(1.2, 1, color[1], adj=c(0,0.5), cex=0.7)#
+	for(i in 2:length(color)) {#
+		points(1.1, i, col= color[i], pch=15, cex=2.1)#
+		text(1.2, i, color[i], adj=c(0,0.5), cex=0.7)#
+	}#
+}
+colorstrip()

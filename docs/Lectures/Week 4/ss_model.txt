@@ -1,0 +1,24 @@
+
+                 model {  
+                 # priors on parameters
+                 # Make sure mu prior is scaled to the data
+                 mu ~ dnorm(Y1, 1/(Y1*100)); 
+                 tau.q ~ dgamma(0.001,0.001); # This is inverse gamma
+                 sd.q <- 1/sqrt(tau.q); # sd is treated as derived parameter
+                 tau.r ~ dgamma(0.001,0.001); # This is inverse gamma
+                 sd.r <- 1/sqrt(tau.r); # sd is treated as derived parameter
+                 u ~ dnorm(0, 0.01);
+                 
+                 # If X[0] = mu instead of X[1]
+                 # X[1] ~ dnorm(mu+u, tau.q)
+                 X[1] <- mu;
+                 Y[1] ~ dnorm(X[1], tau.r);
+                 # Jags is not vectorized, so we have to loop over observations
+                 for(i in 2:N) {
+                 predX[i] <- X[i-1]+u; 
+                 X[i] ~ dnorm(predX[i],tau.q); # Process variation
+                 Y[i] ~ dnorm(X[i], tau.r); # Observation variation
+                 }
+                 }  
+                 
+                 

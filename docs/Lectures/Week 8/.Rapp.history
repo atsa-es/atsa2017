@@ -1,0 +1,38 @@
+read.csv("SRSS_chin.csv")
+dat <- read.csv("SRSS_chin.csv")#
+#
+plot.ts(dat)
+plot.ts(dat[,2])
+dat <- ts(read.csv("SRSS_chin.csv"), start=c(1960,1))
+plot.ts(dat[,2], ylab="Spawning adults")
+plot.ts(dat[,2], ylab="Spawning adults", xlab="Year", col="blue", type="o")
+plot.ts(dat[,2], ylab="Spawning adults", xlab="Year", col="blue", type="b")
+plot.ts(dat[,2], ylab="Spawning adults", xlab="Year", col="blue", type="o", pch=16)
+plot.ts(dat[,2]/1000, ylab="Spawning adults (1000s)", xlab="Year", col="blue", type="o", pch=16)
+par(mai=c(0.8,0.8,0.3,0.1), omi=c(0,0.2,0,0.2))#
+#
+plot.ts(dat[,2]/1000, ylab="Spawning adults (1000s)", xlab="Year", col="blue", type="o", pch=16)
+png("SRSS_chin.png", height=3, width=5.5, units="in", res=300)#
+#
+#par(mai=c(1,0.1,0.3,0.1))#
+par(mai=c(0.8,0.8,0.3,0.1), omi=c(0,0.2,0,0.2))#
+#
+plot.ts(dat[,2]/1000, ylab="Spawning adults (1000s)", xlab="Year", col="blue", type="o", pch=16)#
+#
+dev.off()
+png("SRSS_chin.png", height=3, width=5, units="in", res=300)#
+#
+#par(mai=c(1,0.1,0.3,0.1))#
+par(mai=c(0.8,0.8,0.3,0.1), omi=c(0,0.2,0,0.2))#
+#
+plot.ts(dat[,2]/1000, ylab="Spawning adults (1000s)", xlab="Year", col="blue", type="o", pch=16)#
+#
+dev.off()
+png("SRSS_chin.png", height=3.5, width=5, units="in", res=300)#
+#
+#par(mai=c(1,0.1,0.3,0.1))#
+par(mai=c(0.8,0.8,0.3,0.1), omi=c(0,0.2,0,0.2))#
+#
+plot.ts(dat[,2]/1000, ylab="Spawning adults (1000s)", xlab="Year", col="blue", type="o", pch=16, cex=0.8)#
+#
+dev.off()
