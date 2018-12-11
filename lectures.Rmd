@@ -21,21 +21,21 @@ library(knitr)
 |  | |  | |  |  |
 | 4 | [Covariates in SS models](Lectures/Week 4/Lec 7 - Covariates in MARSS Models.pdf) |  Including seasonality and covariates in models; dealing with missing covariates and colinearity |  |  |
 |  | |  | |  |  |
-| 5 | [Intro to DLM](Lectures/Week 5/Lec 9 - Intro to Dynamic Linear Models.pdf) |  Introduction to Dynamic Linear Modeling |  |  |
+| 5 | [Intro to DLM](Lectures/Week 5/Lec 9 - Intro to Dynamic Linear Models.pdf) |  Introduction to Dynamic Linear Modeling | Chap 15 in [MARSS User Guide](Files/UserGuide.pdf) |  |
 | 5 | [DLM Applications](Lectures/Week 5/Lec 10 - Applications of DLMs.pdf) |  Examples of real-world applications of DLMs.   |  |  |
 |  | |  | |  |  |
 | 6 | [Exponential Smoothing](Lectures/Week 6/Lec_11_-_Exponential_Smoothing_Models.pdf) |  Exponential smoothing models |  |  |
-| 6 | [Dynamic Factor Analysis](Lectures/Week 6/Lec 12 - Dynamic_Factor_Analysis.pdf) |  Dynamic factor analysis   |  |  [DFA_with_the_MARSS_pkg.R](Lectures/Week 6/DFA_with_the_MARSS_pkg.R) |
+| 6 | [Dynamic Factor Analysis](Lectures/Week 6/Lec 12 - Dynamic_Factor_Analysis.pdf) |  Dynamic factor analysis   | Chap 9 in [MARSS User Guide](Files/UserGuide.pdf) |  [DFA_with_the_MARSS_pkg.R](Lectures/Week 6/DFA_with_the_MARSS_pkg.R) |
 |  | |  | |  |  |
-| 7 | [GLMs 1](Lectures/Week 7/Lec 14 - Review of GLMs.pdf) |  Reveiw of generalized linear models |  |  |
+| 7 | [GLMs 1](Lectures/Week 7/Lec 14 - Review of GLMs.pdf) |  Review of generalized linear models |  |  |
 | 7 | [GLMs 2](Lectures/Week 7/Lec 14 - Zeros and non-normal data.pdf) |  Dealing with zeros and non-normal data |  |  |
 | 7 | [Bayesian estimation](Lectures/Week 7/Lec 13 - Bayesian estimation in Stan.pdf) |  Bayesian estimation with STAN   |  |  |
 |  | |  | |  |  |
-| 8 | [Spatial correlation](Lectures/Week 8/Lec 15 - Including spatial correlation.pdf) |  Spatiotemporal models  |  | [Analyzing Snotel data.R](Lectures/Week 8/Lec 15 - Analyzing Snotel data.R) |
+| 8 | [Spatial correlation](Lectures/Week 8/Lec 15 - Including spatial correlation.pdf) |  Spatiotemporal models  |  | [Analyzing Snotel data.R](Lectures/Week 8/Lec 15 - Analyzing Snotel data.R)<br />[SNOTEL_metadata.csv](Lectures/Week 8/SNOTEL_metadata.csv)<br />[SNOTEL_Washington_1981_2013.csv](Lectures/Week 8/SNOTEL_Washington_1981_2013.csv) |
 | 8 | [Estimating Interactions I](Lectures/Week 8/Lec 16 - Estimating Interactions I.pdf) |  Estimating species interaction strengths from ts data | Ives et al 2003 | [Gompertz_example_0.R](Lectures/Week 8/Gompertz_example_0.R) [Gompertz_example_1.R](Lectures/Week 8/Gompertz_example_1.R) [Gompertz_example_2.R](Lectures/Week 8/Gompertz_example_2.R) |
 |  | |  | |  |  |
-| 9 | [Estimating Interactions II](Lectures/Week 9/Lec 17 - Estimating Interactions II.pdf) |  Estimating species interaction strengths from ts data   | Ives et al 2003 | [GompertzSS_REML.R](Lectures/Week 8/GompertzSS_REML.R) |
+| 9 | [Estimating Interactions II](Lectures/Week 9/Lec 17 - Estimating Interactions II.pdf) |  Estimating species interaction strengths from ts data   | Chap 13 in [MARSS User Guide](Files/UserGuide.pdf) | [GompertzSS_REML.R](Lectures/Week 8/GompertzSS_REML.R) |
 | 9 | [Intervention Effects](Lectures/Week 9/Lec 18 - Analyses of intervention effects & structural breaks.pdf) |  Detecting intervention effects in ts data  |  | [indicator_examples.R](Lectures/Week 9/indicator_examples.R) |
-| 9 | [Standardized Residuals](Lectures/Week 9/Lec 19 - Standardized residuals.pdf) | Detecting perturbations in ts data |  |  |
+| 9 | [Standardized Residuals](Lectures/Week 9/Lec 19 - Standardized residuals.pdf) | Detecting perturbations in ts data | Chap 11 in [MARSS User Guide](Files/UserGuide.pdf) |  |
 |  | |  | |  |  |
 | 10 | [Road Map of MARSS models(Files/Table of MARSS models.pdf) |  | |  |  |
