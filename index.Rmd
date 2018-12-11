@@ -1,5 +1,5 @@
 ---
-title: "Applied Time Series Analysis (FISH 507)"
+title: "Win 2017: Applied Time Series Analysis (FISH 507)"
 output: html_document
 ---
 
