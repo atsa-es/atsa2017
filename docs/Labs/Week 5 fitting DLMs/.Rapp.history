@@ -1,0 +1,1030 @@
+plot(seq(0.001,0.04,0.001),dnorm(0,1,sqrt(seq(0.001,0.04,0.001))))
+plot(seq(0.001,0.06,0.001),dnorm(0,1,sqrt(seq(0.001,0.06,0.001))))
+nn <- (as.Date("2010-11-26  21:00:00")-as.Date("2006-12-17  00:00:00"))*24#
+tt <- ts(rnorm(nn),start=c(2006,(as.Date("2006-12-17  00:00:00")-as.Date("2006-1-1  00:00:00"))*24),freq=52*7*24)
+plot.ts(tt, xaxt="n")#
+axis.Date(1,at=seq.Date(as.Date("2006-12-17  00:00:00"),as.Date("2010-11-26 21:00:00"),by="month"))
+par()$usr
+plot(tt, xaxt="n")
+axis.Date(1,at=seq.Date(as.Date("2006-12-17  00:00:00"),as.Date("2010-11-26 21:00:00"),by="month"))
+axis.Date(1,x=seq.Date(as.Date("2006-12-17  00:00:00"),as.Date("2010-11-26 21:00:00"),by="month"))
+length(nn)
+nn
+nn <- (as.Date("2007-11-26  21:00:00")-as.Date("2006-12-17  00:00:00"))*24#
+tt <- ts(rnorm(nn),start=c(2006,(as.Date("2006-12-17  00:00:00")-as.Date("2006-1-1  00:00:00"))*24),freq=52*7*24)#
+#
+plot.ts(tt, xaxt="n")
+nn <- (as.Date("2007-1-26  21:00:00")-as.Date("2006-12-17  00:00:00"))*24#
+tt <- ts(rnorm(nn),start=c(2006,(as.Date("2006-12-17  00:00:00")-as.Date("2006-1-1  00:00:00"))*24),freq=52*7*24)#
+#
+plot.ts(tt, xaxt="n")
+axis.Date(1,x=seq.Date(as.Date("2006-12-17  00:00:00"),as.Date("2007-1-26 21:00:00"),by="month"))
+par()$usr
+seq.Date(as.Date("2006-12-17  00:00:00"),as.Date("2007-1-26 21:00:00"),by="month")
+axis.Date(1,x=seq.Date(as.Date("2006-12-17  00:00:00"),as.Date("2007-1-26 21:00:00"),by="week"))
+axis.Date(1,at=seq.Date(as.Date("2006-12-17  00:00:00"),as.Date("2007-1-26 21:00:00"),by="week"))
+seq.Date(as.Date("2006-12-17  00:00:00"),as.Date("2007-1-26 21:00:00"),by="week")
+?date
+Date(seq.Date(as.Date("2006-12-17  00:00:00"),as.Date("2007-1-26 21:00:00"),by="week"))
+tt
+plot.ts(ts(rnorm(120),start(2010,1),freq=12))
+plot.ts(ts(rnorm(120),start(2010,1),freq=4))
+plot.ts(ts(rnorm(120),start(2010,1),freq=12))
+xx <- ts(rnorm(120),start(2010,1),freq=12)
+xx
+xx <- ts(rnorm(120),start(2010,1),freq=4)
+xx
+xx <- ts(rnorm(120),start(2010,1),freq=12)
+xx
+xx <- ts(rnorm(120),start(2000,1),freq=12)#
+plot.ts(xx,xaxt="n")
+axis.Date(1,at=seq.Date(as.Date("2000-01-00  00:00:00"),as.Date("2009-12-00 21:00:00"),by="month"))
+axis.Date(1,at=seq.Date(as.Date("2000-01-01  00:00:00"),as.Date("2009-12-01 00:00:00"),by="month"))
+seq.Date(as.Date("2000-01-01  00:00:00"),as.Date("2009-12-01 00:00:00"),by="month")
+seq.Date(as.Date("2000-01-01  00:00:00"),as.Date("2009-12-01 00:00:00"),by="year")
+axis.Date(1,at=seq.Date(as.Date("2000-01-01  00:00:00"),as.Date("2009-12-01 00:00:00"),by="year"))
+52*7
+dat <- read.csv("atm_junk.csv")
+dat
+head(dat)
+tt <- ts(dat$tot_amount, start=c(2013,1), freq=52)
+tt
+(as.Date("2013-09-01") - as.Date("2013-01-01")
+)
+beginDay <- (as.Date("2013-09-01") - as.Date("2013-01-01"))#
+tt <- ts(dat$tot_amount, start=c(2013,beginDay), freq=365)
+tt
+plot.ts(tt)
+library(forecast)
+tsMod <- auto.arima(tt)
+tsMod
+forecast(tsMod, 10)
+?last
+?end
+length(tt)
+auto.arima(tt[-((length(tt)-nn):nn)])
+nn <- 10
+tt[-((length(tt)-nn):nn)]
+tt
+nn
+(length(tt)-nn)
+-((length(tt)-nn):nn)
+(length(tt)-nn):nn)
+(length(tt)-nn)
+nn
+auto.arima(tt[-((length(tt)-nn):length(tt))])
+-((length(tt)-nn):length(tt))
+forecast(tsMod, 10)
+plot.ts(tt)#
+#
+nn <- 10#
+#
+tsMod <- auto.arima(tt[-((length(tt)-nn):length(tt))])#
+#
+ff <- forecast(tsMod, 10)#
+#
+points(ff)
+ff
+names(ff)
+ff$mean
+points(ff$mean)
+tt
+ff$fitted
+points(ff$fitted)
+plot(tt)
+plot(seq(length(tt)),tt)
+plot(seq(length(tt)),tt,type="l")
+points(ff$fitted)
+points(ff$mean, pch=16, col="blue")
+dat <- read.csv("atm_junk.csv")#
+#
+dat$tot_amount[is.na(dat$tot_amount)] <- NA
+beginDay <- (as.Date("2013-09-01") - as.Date("2013-01-01"))#
+tt <- ts(dat$tot_amount, start=c(2013,beginDay), freq=365)
+tt
+is.na(dat$tot_amount)
+dat <- read.csv("atm_junk.csv")
+dat <- read.csv("atm_junk.csv")#
+#
+dat$tot_amount[dat$tot_amount==0] <- NA#
+#
+beginDay <- (as.Date("2013-09-01") - as.Date("2013-01-01"))#
+tt <- ts(dat$tot_amount, start=c(2013,beginDay), freq=365)
+tt
+plot(seq(length(tt)),tt,type="l")#
+points(ff$fitted, pch=16, col="blue")#
+points(ff$mean, pch=16, col="blue")
+points(ff$mean, pch=16, col="red")
+plot(seq(length(tt)),tt,type="l")#
+points(ff$fitted, pch=16, col="blue")
+points(ff$mean, pch=16, col="red")
+nn <- 10#
+#
+tsMod <- auto.arima(tt[-((length(tt)-nn+1):length(tt))])#
+#
+ff <- forecast(tsMod, 10)#
+#
+plot(seq(length(tt)),tt,type="l")#
+points(ff$fitted, pch=16, col="blue")#
+points(ff$mean, pch=16, col="red")
+tt <- ts(log(dat$tot_amount), start=c(2013,beginDay), freq=365)#
+plot.ts(tt)
+tsMod <- auto.arima(tt[-((length(tt)-nn+1):length(tt))])#
+#
+ff <- forecast(tsMod, 10)#
+#
+plot(seq(length(tt)),tt,type="l")#
+points(ff$fitted, pch=16, col="blue")#
+points(ff$mean, pch=16, col="red")
+head(dat)
+tsMod <- auto.arima(tt[], xreg=dat[-((length(tt)-nn+1):length(tt)),"Holiday_flag"])
+dat[-((length(tt)-nn+1):length(tt)),"Holiday_flag"]
+tsMod <- auto.arima(tt[-((length(tt)-nn+1):length(tt))], xreg=dat[-((length(tt)-nn+1):length(tt)),"Holiday_flag"])
+ff <- forecast(tsMod, 10)#
+#
+plot(seq(length(tt)),tt,type="l")#
+points(ff$fitted, pch=16, col="blue")#
+points(ff$mean, pch=16, col="red")
+dat <- read.csv("atm_junk.csv")
+dat <- read.csv("atm_junk.csv")#
+#
+dat$tot_amount[dat$tot_amount==0] <- NA#
+#
+nFit <- 173#
+nFore <- 31#
+beginDay <- (as.Date("2013-09-01") - as.Date("2013-01-01"))#
+tt <- ts(log(dat$tot_amount), start=c(2013,beginDay), freq=365)
+nFore <- 31#
+#
+tsMod <- auto.arima(tt[1:nFit], xreg=dat[1:nFit,"Holiday_flag"])#
+#
+ff <- forecast(tsMod, nFore)
+dat[1:nFit,"Holiday_flag"]
+?forecast
+ff <- forecast(tsMod, nFore, xreg=rep(0,nFore))
+plot(seq(length(tt)),tt,type="l")
+points(ff$fitted, pch=16, col="blue")#
+points(ff$mean, pch=16, col="red")
+decompose(tt)
+decompose(tt, na.rm=TRUE)
+dat <- read.csv("atm_junk.csv")#
+#
+dat$tot_amount[dat$tot_amount==0] <- mean(dat$tot_amount[dat$tot_amount!=0]) # NA#
+#
+nFit <- 173#
+nFore <- 31#
+beginDay <- (as.Date("2013-09-01") - as.Date("2013-01-01"))#
+tt <- ts(log(dat$tot_amount), start=c(2013,beginDay), freq=365)
+nFore <- 31#
+#
+tsMod <- auto.arima(tt[1:nFit], xreg=dat[1:nFit,"Holiday_flag"])#
+#
+ff <- forecast(tsMod, nFore, xreg=rep(0,nFore))#
+#
+plot(seq(length(tt)),tt,type="l")#
+points(ff$fitted, pch=16, col="blue")#
+points(ff$mean, pch=16, col="red")
+decompose(tt)
+tt <- ts(log(dat$tot_amount), start=c(2013,beginDay), freq=52)#
+plot.ts(tt)#
+#
+nFore <- 31#
+#
+tsMod <- auto.arima(tt[1:nFit], xreg=dat[1:nFit,"Holiday_flag"])#
+#
+ff <- forecast(tsMod, nFore, xreg=rep(0,nFore))#
+#
+plot(seq(length(tt)),tt,type="l")#
+points(ff$fitted, pch=16, col="blue")#
+points(ff$mean, pch=16, col="red")
+decompose(tt)
+?decompose
+plot(decompose(tt))
+(as.Date("2013-09-01") - as.Date("2013-01-01"))
+(as.Date("2013-09-01") - as.Date("2013-01-01"))/7
+dat <- read.csv("atm_junk.csv")#
+#
+dat$tot_amount[dat$tot_amount==0] <- mean(dat$tot_amount[dat$tot_amount!=0]) # NA#
+#
+nFit <- 173#
+nFore <- 31#
+beginDay <- (as.Date("2013-09-01") - as.Date("2013-01-01"))#
+tt <- ts(log(dat$tot_amount), start=c(2013,beginDay), freq=365)#
+plot.ts(tt)
+tt <- ts(dat$tot_amount, start=c(2013,beginDay), freq=365)#
+plot.ts(tt)
+dat <- read.csv("atm_junk.csv")#
+#
+dat$tot_amount[dat$tot_amount==0] <- mean(dat$tot_amount[dat$tot_amount!=0]) # NA#
+#
+nFit <- 173#
+nFore <- 31#
+#
+datFit <- dat[1:173,]
+dat <- read.csv("atm_junk.csv")#
+#
+dat$tot_amount[dat$tot_amount==0] <- mean(dat$tot_amount[dat$tot_amount!=0]) # NA#
+#
+nFit <- 173#
+nFore <- 31#
+#
+datFit <- dat[1:173,]#
+#
+beginDay <- (as.Date("2013-09-01") - as.Date("2013-01-01"))#
+tt <- ts(datFit$tot_amount, start=c(2013,beginDay), freq=365)#
+plot.ts(tt)
+dat <- read.csv("atm_junk.csv")#
+#
+dat$tot_amount[dat$tot_amount==0] <- NA #mean(dat$tot_amount[dat$tot_amount!=0]) # NA#
+#
+nFit <- 173#
+nFore <- 31#
+#
+datFit <- dat[1:173,]#
+#
+beginDay <- (as.Date("2013-09-01") - as.Date("2013-01-01"))#
+tt <- ts(datFit$tot_amount, start=c(2013,beginDay), freq=365)#
+plot.ts(tt)
+datFit$tot_amount[datFit$tot_amount==0] <- NA#
+    nFit <- length(datFit$tot_amount)#
+    beginDay <- (as.Date("2013-09-01") - as.Date("2013-01-01"))#
+    tt <- ts(datFit$tot_amount, start=c(2013,beginDay), freq=365)#
+    plot.ts(tt)
+auto.arima(tt, xreg=datFit$Holiday_flag)
+summary(tsMod)
+union(tt,ff)
+?union
+ff
+datFit
+datFore
+datFore <- dat[173+1:nFore,]
+datFore
+TF <- c(datFit$tot_amount,datFore$tot_amount)
+TF
+plot(seq(length(TF)),TF,type="l")
+points(ff$fitted, pch=16, col="blue")
+tsMod <- auto.arima(tt, xreg=datFore$Holiday_flag)#
+#
+ff <- forecast(tsMod, nFore, xreg=rep(0,nFore))
+tsMod <- auto.arima(tt, xreg=datFit$Holiday_flag)
+ff <- forecast(tsMod, nFore, xreg=rep(0,nFore))#
+#
+TF <- c(datFit$tot_amount,datFore$tot_amount)#
+#
+plot(seq(length(TF)),TF,type="l")
+points(ff$fitted, pch=16, col="blue")
+ff$fitted
+plot(tt)
+points(ff$fitted, pch=16, col="blue")
+beginDay <- (as.Date("2013-09-01") - as.Date("2013-01-01"))#
+t1 <- ts(datFit$tot_amount, start=c(2013,beginDay), freq=365)#
+plot.ts(t1)#
+#
+nFore <- 31#
+#
+tsMod <- auto.arima(t1, xreg=datFit$Holiday_flag)
+tt
+beginDay <- (as.Date("2013-09-01") - as.Date("2013-01-01"))#
+t1 <- ts(datFit$tot_amount, start=c(2013,beginDay), freq=365)
+t1
+ff$fitted
+ff$mean
+TF <- c(datFit$tot_amount,datFore$tot_amount)#
+#
+plot(seq(length(TF)),TF,type="l")
+points(ff$fitted, pch=16, col="blue")#
+points(ff$mean, pch=16, col="red")
+beginDay <- (as.Date("2013-09-01") - as.Date("2013-01-01"))#
+t1 <- ts(datFit$tot_amount, start=c(2013,beginDay), freq=365)#
+plot.ts(t1)#
+#
+nFore <- 31#
+#
+tsMod <- auto.arima(t1, xreg=datFit$Holiday_flag)#
+#
+ff <- forecast(tsMod, nFore, xreg=rep(0,nFore))
+beginDay <- (as.Date("2014-03-01") - as.Date("2014-01-01"))#
+t2 <- ts(datFit$tot_amount, start=c(2014,beginDay), freq=365)
+plot(union(t1,t2))
+tf <- union(t1,t2)#
+#
+plot(seq(length(tf)),tf,type="l")
+points(ff$fitted, pch=16, col="blue")
+ff$fitted
+plot.ts(tf)
+points(ff$fitted, pch=16, col="blue")#
+points(ff$mean, pch=16, col="red")
+tf
+tf <- ts.union(t1,t2)
+tf
+tf <- c(t1,t2)
+tf
+beginDay <- (as.Date("2013-09-01") - as.Date("2013-01-01"))
+tf <- ts(c(datFit$tot_amount,datFore$tot_amount), start=c(2013,beginDay), freq=365)
+plot.ts(tf)
+points(ff$fitted, pch=16, col="blue")#
+points(ff$mean, pch=16, col="red")
+nn <- 2000#
+tt <- seq(c(ISOdate(2015,1,1)), by="5 min", length=nn)#
+tt <- seq(ISOdate(2015,1,1), by="5 min", length=nn)#
+xx <- xts(rnorm(nn), tt)#
+#
+# max temp for each day#
+mm <- apply.daily(xx[,1], max, na.rm=TRUE)#
+# time of day of max temp#
+ii <- index(xx)[xx[,1] %in% mm]#
+# mean time of day for max temp
+library(xts)#
+nn <- 2000#
+tt <- seq(c(ISOdate(2015,1,1)), by="5 min", length=nn)#
+tt <- seq(ISOdate(2015,1,1), by="5 min", length=nn)#
+xx <- xts(rnorm(nn), tt)#
+#
+# max temp for each day#
+mm <- apply.daily(xx[,1], max, na.rm=TRUE)#
+# time of day of max temp#
+ii <- index(xx)[xx[,1] %in% mm]
+update(ii, year=2000, month=1, mday=1)
+mean(update(ii, year=2000, month=1, mday=1))
+library(lubridate)
+mean(update(ii, year=2000, month=1, mday=1))
+format(mean(update(ii, year=2000, month=1, mday=1)), format = "%H:%M:%S")
+# max temp for each day#
+mm <- apply.daily(xx[,1], max, na.rm=TRUE)#
+# time of day of max temp#
+ii <- index(xx)[xx[,1] %in% mm]#
+# use lubridate to make dates all the same#
+library(lubridate)#
+jj <- update(ii, year=2000, month=1, mday=1)#
+# mean time of day for max temp#
+format(mean(jj), format = "%H:%M:%S")
+# max temp for each day#
+    Tmax <- apply.daily(xx_select1$Temp_C[,1], max, na.rm=TRUE)#
+    # time of day of max temp#
+    timeTmax <- index(xx_select1$Temp_C)[xx_select1$Temp_C[,1] %in% Tmax]
+xx_select1$Temp_C[,1] <- xx
+library(rjags)#
+load.module('glm')#
+#
+dataList = list(#
+  z = c(81, 59, 36, 18, 28, 59, 63, 57, 42, 28, 47, 55, 38, #
+        30, 22, 32, 31, 30, 32, 33, 32, 26, 13, 33, 30), #
+  N = rep(96, 25),#
+  Nsubj = 25#
+)#
+#
+sink("mymodel.txt")#
+cat("model {#
+#
+  m ~ dbern(.5)#
+#
+  omegaM1[1] <- 0.5      #true prior#
+  omegaM1[2] <- 0.5      #psuedo prior #
+  kappaM1[1] <- 3        #true prior for Model 1#
+  kappaM1[2] <- 5        #puedo prior for Model 1#
+#
+  omegaM2[1] <- 0.5      #psuedo prior#
+  omegaM2[2] <- 0.5      #true prior#
+  kappaM2[1] <- 5        #puedo  prior for Model 2#
+  kappaM2[2] <- 10        #true prior for Model 2#
+#
+    for ( s in 1:Nsubj ) {#
+#
+    mE1[s] ~ dbeta(omegaM1[m+1]*(kappaM1[m+1]-2)+1 , (1-omegaM1[m+1])*(kappaM1[m+1]-2)+1 )#
+    mE2[s] ~ dbeta(omegaM2[m+1]*(kappaM2[m+1]-2)+1 , (1-omegaM2[m+1])*(kappaM2[m+1]-2)+1 )#
+    z[s] ~ dbin( (1-m)*mE1[s] + m*mE2[s] , N[s] )#
+#
+    }#
+    }#
+    ", fill=TRUE)#
+sink()#
+inits <- function(){list(m=0)}#
+#
+params <- c("m")#
+#
+nc <- 1#
+n.adapt <-100#
+n.burn <- 200#
+n.iter <- 5000#
+thin <- 1#
+mymodel <- jags.model('mymodel.txt', data = dataList, inits=inits, n.chains=nc, n.adapt=n.adapt)#
+update(mymodel, n.burn)#
+mymodel_samples <- coda.samples(mymodel,params,n.iter=n.iter, thin=thin)#
+summary(mymodel_samples)
+shareeditflag
+sink("mymodel.txt")#
+cat("model {#
+#
+  m ~ dbern(phi)#
+  phi ~ dunif(0,1)#
+#
+  omegaM1[1] <- 0.5      #true prior#
+  omegaM1[2] <- 0.5      #psuedo prior #
+  kappaM1[1] <- 3        #true prior for Model 1#
+  kappaM1[2] <- 5        #puedo prior for Model 1#
+#
+  omegaM2[1] <- 0.5      #psuedo prior#
+  omegaM2[2] <- 0.5      #true prior#
+  kappaM2[1] <- 5        #puedo  prior for Model 2#
+  kappaM2[2] <- 10        #true prior for Model 2#
+#
+    for ( s in 1:Nsubj ) {#
+#
+    mE1[s] ~ dbeta(omegaM1[m+1]*(kappaM1[m+1]-2)+1 , (1-omegaM1[m+1])*(kappaM1[m+1]-2)+1 )#
+    mE2[s] ~ dbeta(omegaM2[m+1]*(kappaM2[m+1]-2)+1 , (1-omegaM2[m+1])*(kappaM2[m+1]-2)+1 )#
+    z[s] ~ dbin( (1-m)*mE1[s] + m*mE2[s] , N[s] )#
+#
+    }#
+    }#
+    ", fill=TRUE)#
+sink()#
+inits <- function(){list(m=0)}#
+#
+params <- c("m", "phi")#
+#
+nc <- 1#
+n.adapt <-100#
+n.burn <- 200#
+n.iter <- 5000#
+thin <- 1#
+mymodel <- jags.model('mymodel.txt', data = dataList, inits=inits, n.chains=nc, n.adapt=n.adapt)#
+update(mymodel, n.burn)#
+mymodel_samples <- coda.samples(mymodel,params,n.iter=n.iter, thin=thin)
+summary(mymodel_samples)
+nn <- 100#
+#
+x1 <- x2 <- x3 <- ww <- rnorm(nn,0,0.1)#
+#
+b0 <- 2#
+b1 <- 1#
+#
+cc <- 1#
+#
+c1 <- c(rep(0,nn/2),rep(1,nn/2))#
+#
+c2 <- c(rep(0,10),rep(3,30),rep(0,60))#
+for(t in 2:nn) {#
+	x1[t] <- b0 + b1*x1[t-1] + ww[t]#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	x3[t] <- b0 + b1*(x2[t-1]-b0-cc*c2[t-1]) + cc*c2[t] + ww[t]#
+}#
+#
+plot.ts(cbind(x1,x2,x3))#
+mean(x1)#
+mean(x2)#
+mean(x3)
+nn <- 100#
+#
+x1 <- x2 <- x3 <- ww <- rnorm(nn,0,0.1)#
+#
+b0 <- 2#
+b1 <- 0.5#
+#
+cc <- 1#
+#
+c1 <- c(rep(0,nn/2),rep(1,nn/2))#
+#
+c2 <- c(rep(0,10),rep(3,30),rep(0,60))#
+for(t in 2:nn) {#
+	x1[t] <- b0 + b1*x1[t-1] + ww[t]#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	x3[t] <- b0 + b1*(x3[t-1]-b0) + cc*c2[t] + ww[t]#
+}#
+#
+plot.ts(cbind(x1,x2,x3))#
+mean(x1)#
+mean(x2)#
+mean(x3)
+b1 <- 0.99#
+#
+cc <- 1#
+#
+c1 <- c(rep(0,nn/2),rep(1,nn/2))#
+#
+c2 <- c(rep(0,10),rep(3,30),rep(0,60))#
+for(t in 2:nn) {#
+	x1[t] <- b0 + b1*x1[t-1] + ww[t]#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	x3[t] <- b0 + b1*(x3[t-1]-b0) + cc*c2[t] + ww[t]#
+}#
+#
+plot.ts(cbind(x1,x2,x3))#
+mean(x1)#
+mean(x2)#
+mean(x3)
+b1 <- 0.1#
+#
+cc <- 1#
+#
+c1 <- c(rep(0,nn/2),rep(1,nn/2))#
+#
+c3 <- c(rep(0,10),rep(3,30),rep(0,60))#
+for(t in 2:nn) {#
+	x1[t] <- b0 + b1*x1[t-1] + ww[t]#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	x3[t] <- b0 + b1*(x3[t-1]-b0) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(x1,x2,x3))#
+mean(x1)#
+mean(x2)#
+mean(x3)
+b1 <- 0.5#
+#
+cc <- 1#
+#
+c1 <- c(rep(0,nn/2),rep(1,nn/2))#
+#
+c3 <- c(rep(0,10),rep(3,30),rep(0,60))#
+for(t in 2:nn) {#
+	x1[t] <- b0 + b1*x1[t-1] + ww[t]#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	x3[t] <- b0 + b1*(x3[t-1]-b0) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(x1,x2,x3))#
+mean(x1)#
+mean(x2)#
+mean(x3)
+b1 <- 0.8#
+#
+cc <- 1#
+#
+c1 <- c(rep(0,nn/2),rep(1,nn/2))#
+#
+c3 <- c(rep(0,10),rep(3,30),rep(0,60))#
+for(t in 2:nn) {#
+	x1[t] <- b0 + b1*x1[t-1] + ww[t]#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	x3[t] <- b0 + b1*(x3[t-1]-b0) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(x1,x2,x3))#
+mean(x1)#
+mean(x2)#
+mean(x3)
+for(t in 2:nn) {#
+	x1[t] <- b0 + b1*x1[t-1] + ww[t]#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	x3[t] <- b0 + b1*(x3[t-1]-b0-cc*c3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(x1,x2,x3))#
+mean(x1)#
+mean(x2)#
+mean(x3)
+for(t in 2:nn) {#
+	x1[t] <- b0 + b1*x1[t-1] + ww[t]#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(x1,x2,x3))#
+mean(x1)#
+mean(x2)#
+mean(x3)
+b1 <- 0.5#
+#
+cc <- 1#
+#
+c1 <- c(rep(0,nn/2),rep(1,nn/2))#
+#
+c3 <- c(rep(0,10),rep(3,30),rep(0,60))#
+for(t in 2:nn) {#
+	x1[t] <- b0 + b1*x1[t-1] + ww[t]#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(x1,x2,x3))#
+mean(x1)#
+mean(x2)#
+mean(x3)
+c3 <- c(rep(0,10),rep(1,30),rep(-1,60))#
+for(t in 2:nn) {#
+	x1[t] <- b0 + b1*x1[t-1] + ww[t]#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(x1,x2,x3))#
+mean(x1)#
+mean(x2)#
+mean(x3)
+for(t in 2:nn) {#
+	x1[t] <- b0 + b1*x1[t-1] + ww[t]#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	x3[t] <- b0 + b1*(x3[t-1]-b0) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(x1,x2,x3))#
+mean(x1)#
+mean(x2)#
+mean(x3)
+for(t in 2:nn) {#
+	x1[t] <- b0 + b1*x1[t-1] + ww[t]#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	x3[t] <- b0 + b1*(x3[t-1]-b0-cc*c3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(x1,x2,x3))#
+mean(x1)#
+mean(x2)#
+mean(x3)
+c3
+c3 <- c(rep(0,10),rep(3,30),rep(0,60))#
+#c3 <- c(rep(0,10),rep(1,30),rep(-1,60))#
+for(t in 2:nn) {#
+	x1[t] <- b0 + b1*x1[t-1] + ww[t]#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	x3[t] <- b0 + b1*(x3[t-1]-b0-cc*c3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(x1,x2,x3))#
+mean(x1)#
+mean(x2)#
+mean(x3)
+b1 <- 1#
+#
+cc <- 1#
+#
+c1 <- c(rep(0,nn/2),rep(1,nn/2))#
+#
+c3 <- c(rep(0,10),rep(3,30),rep(0,60))#
+#c3 <- c(rep(0,10),rep(1,30),rep(-1,60))#
+for(t in 2:nn) {#
+	x1[t] <- b0 + b1*x1[t-1] + ww[t]#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	x3[t] <- b0 + b1*(x3[t-1]-b0-cc*c3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(x1,x2,x3))#
+mean(x1)#
+mean(x2)#
+mean(x3)
+for(t in 2:nn) {#
+	x1[t] <- b0 + b1*x1[t-1] + ww[t]#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	x3[t] <- b0 + b1*(x3[t-1]-b0-cc*c3[t-1]) + cc*c3[t] + ww[t]#
+	x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(x1,x2,x3))#
+mean(x1)#
+mean(x2)#
+mean(x3)
+c3 <- c(rep(0,10),rep(1,30),rep(-1,60))#
+for(t in 2:nn) {#
+	x1[t] <- b0 + b1*x1[t-1] + ww[t]#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	x3[t] <- b0 + b1*(x3[t-1]-b0-cc*c3[t-1]) + cc*c3[t] + ww[t]#
+	x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(x1,x2,x3))#
+mean(x1)#
+mean(x2)#
+mean(x3)
+c3 <- c(rep(0,10),rep(3,30),rep(0,60))#
+#c3 <- c(rep(0,10),rep(1,30),rep(-1,60))#
+for(t in 2:nn) {#
+	x1[t] <- b0 + b1*x1[t-1] + ww[t]#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	x3[t] <- b0 + b1*(x3[t-1]-b0-cc*c3[t-1]) + cc*c3[t] + ww[t]#
+	x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(x1,x2,x3))#
+mean(x1)#
+mean(x2)#
+mean(x3)
+b1 <- 0.95#
+#
+cc <- 1#
+#
+c1 <- c(rep(0,nn/2),rep(1,nn/2))#
+#
+c3 <- c(rep(0,10),rep(3,30),rep(0,60))#
+#c3 <- c(rep(0,10),rep(1,30),rep(-1,60))#
+for(t in 2:nn) {#
+	x1[t] <- b0 + b1*x1[t-1] + ww[t]#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	x3[t] <- b0 + b1*(x3[t-1]-b0-cc*c3[t-1]) + cc*c3[t] + ww[t]#
+	x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(x1,x2,x3))#
+mean(x1)#
+mean(x2)#
+mean(x3)
+for(t in 2:nn) {#
+	x1[t] <- b0 + b1*x1[t-1] + ww[t]#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	x3[t] <- b0 + b1*(x3[t-1]-b0-cc*c3[t-1]) + cc*c3[t] + ww[t]#
+	#x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(x1,x2,x3))#
+mean(x1)#
+mean(x2)#
+mean(x3)
+for(t in 2:nn) {#
+	x1[t] <- b0 + b1*x1[t-1] + ww[t]#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	x3[t] <- b0 + b1*(x3[t-1]-b0) + cc*c3[t] + ww[t]#
+	#x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(x1,x2,x3))#
+mean(x1)#
+mean(x2)#
+mean(x3)
+for(t in 2:nn) {#
+	x1[t] <- b0 + b1*x1[t-1] + ww[t]#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	x3[t] <- b0 + b1*(x3[t-1]-b0) + cc*c3[t] + ww[t]#
+	x3[t] <- b0 + cc*c3[t] + ww[t]#
+	#x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(x1,x2,x3))#
+mean(x1)#
+mean(x2)#
+mean(x3)
+hist(rpois(1000,180))
+mm <- rpois(1000,180)#
+hist(mm,breaks=seq(min(mm),max(mm)))
+hist(mm,breaks=seq(min(mm),max(mm),by=2))
+mm <- rpois(1000,100)#
+hist(mm,breaks=seq(min(mm),max(mm),by=2))
+mm <- rpois(1000,50)#
+hist(mm,breaks=seq(min(mm),max(mm),by=2))
+mm <- rpois(1000,500)#
+hist(mm,breaks=seq(min(mm),max(mm),by=2))
+hh <- hist(mm,breaks=seq(min(mm),max(mm),by=2))
+hh
+filter(hh,seq(7)/7)
+filter(hh,filter=seq(7)/7)
+filter(hh$counts,filter=seq(7)/7)
+filter(hh$counts,filter=seq(7)/7,"recursive")
+filter(hh$counts,filter=seq(7)/7)
+filter(hh$counts,filter=seq(7)/7)+10
+plot.ts(filter(hh$counts,filter=seq(7)/7))
+plot.ts(filter(hh$counts,filter=seq(5)/5))
+plot.ts(filter(hh$counts,filter=seq(3)/3))
+hist(exp(rnorm(1000)))
+nn <- 100#
+#
+y1 <- x2 <- ww <- rnorm(nn,0,0.1)#
+#
+b0 <- 2#
+b1 <- 0.5#
+#
+y1[1] <- rnorm(0,exp(x2[1]))#
+for(t in 2:nn) {#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	y1[t] <- rnorm(0,exp(x2[t]))#
+	#x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(y1,x2))
+nn <- 100#
+#
+y1 <- x2 <- ww <- rnorm(nn,0,0.1)#
+#
+b0 <- 2#
+b1 <- 0.5#
+#
+y1[1] <- rnorm(1,0,exp(x2[1]))#
+for(t in 2:nn) {#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	y1[t] <- rnorm(1,0,exp(x2[t]))#
+	#x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(y1,x2))
+y1 <- x2 <- ww <- rnorm(nn,0,0.1)#
+#
+b0 <- 2#
+b1 <- 0.5#
+#
+y1[1] <- exp(rnorm(1,0,exp(x2[1])))#
+for(t in 2:nn) {#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	y1[t] <- exp(rnorm(1,0,exp(x2[t])))#
+	#x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(y1,x2))
+nn <- 100#
+#
+y1 <- x2 <- ww <- rnorm(nn,0,0.1)#
+#
+b0 <- 0#
+b1 <- 0.5#
+#
+y1[1] <- exp(rnorm(1,0,exp(x2[1])))#
+for(t in 2:nn) {#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	y1[t] <- exp(rnorm(1,0,exp(x2[t])))#
+	#x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(y1,x2))
+b1 <- 0.1#
+#
+y1[1] <- exp(rnorm(1,0,exp(x2[1])))#
+for(t in 2:nn) {#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	y1[t] <- exp(rnorm(1,0,exp(x2[t])))#
+	#x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(y1,x2))
+b1 <- 0.9#
+#
+y1[1] <- exp(rnorm(1,0,exp(x2[1])))#
+for(t in 2:nn) {#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	y1[t] <- exp(rnorm(1,0,exp(x2[t])))#
+	#x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(y1,x2))
+b1 <- 0.5#
+#
+y1[1] <- exp(rnorm(1,0,exp(x2[1])))#
+for(t in 2:nn) {#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	y1[t] <- exp(rnorm(1,0,exp(x2[t])))#
+	#x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(y1,x2))
+b0 <- 1#
+b1 <- 0.5#
+#
+y1[1] <- exp(rnorm(1,0,exp(x2[1])))#
+for(t in 2:nn) {#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t]#
+	y1[t] <- exp(rnorm(1,0,exp(x2[t])))#
+	#x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(y1,x2))
+b0 <- 1#
+b1 <- 0.5#
+#
+y1[1] <- exp(rnorm(1,0,exp(x2[1])))#
+for(t in 2:nn) {#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t] + c1[t]#
+	y1[t] <- exp(rnorm(1,0,exp(x2[t])))#
+	#x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(y1,x2))
+b0 <- 0#
+b1 <- 0.5#
+#
+y1[1] <- exp(rnorm(1,0,exp(x2[1])))#
+for(t in 2:nn) {#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t] + c1[t]#
+	y1[t] <- exp(rnorm(1,0,exp(x2[t])))#
+	#x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(y1,x2))
+y1[1] <- exp(rnorm(1,0,exp(x2[1])))#
+for(t in 2:nn) {#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t] + c3[t]#
+	y1[t] <- exp(rnorm(1,0,exp(x2[t])))#
+	#x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(y1,x2))
+c3 <- c(rep(0,10),rep(1,30),rep(-1,60))
+y1[1] <- exp(rnorm(1,0,exp(x2[1])))#
+for(t in 2:nn) {#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t] + c3[t]#
+	y1[t] <- exp(rnorm(1,0,exp(x2[t])))#
+	#x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(y1,x2))
+b0 <- -0.5#
+b1 <- 0.5#
+#
+y1[1] <- exp(rnorm(1,0,exp(x2[1])))#
+for(t in 2:nn) {#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t] + c3[t]#
+	y1[t] <- exp(rnorm(1,0,exp(x2[t])))#
+	#x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(y1,x2))
+b0 <- -1#
+b1 <- 0.5#
+#
+y1[1] <- exp(rnorm(1,0,exp(x2[1])))#
+for(t in 2:nn) {#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t] + c3[t]#
+	y1[t] <- exp(rnorm(1,0,exp(x2[t])))#
+	#x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(y1,x2))
+b1 <- 0.9#
+#
+y1[1] <- exp(rnorm(1,0,exp(x2[1])))#
+for(t in 2:nn) {#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t] + c3[t]#
+	y1[t] <- exp(rnorm(1,0,exp(x2[t])))#
+	#x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(y1,x2))
+b1 <- 0.7#
+#
+y1[1] <- exp(rnorm(1,0,exp(x2[1])))#
+for(t in 2:nn) {#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t] + c3[t]#
+	y1[t] <- exp(rnorm(1,0,exp(x2[t])))#
+	#x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(y1,x2))
+b1 <- 0.1#
+#
+y1[1] <- exp(rnorm(1,0,exp(x2[1])))#
+for(t in 2:nn) {#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t] + c3[t]#
+	y1[t] <- exp(rnorm(1,0,exp(x2[t])))#
+	#x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(y1,x2))
+b1 <- 0.2#
+#
+y1[1] <- exp(rnorm(1,0,exp(x2[1])))#
+for(t in 2:nn) {#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t] + c3[t]#
+	y1[t] <- exp(rnorm(1,0,exp(x2[t])))#
+	#x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(y1,x2))
+nn <- 100#
+#
+y1 <- x2 <- ww <- rnorm(nn,0,0.1)#
+#
+b0 <- -1#
+b1 <- 0.2#
+#
+y1[1] <- exp(rnorm(1,0,exp(x2[1])))#
+for(t in 2:nn) {#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t] + c3[t]#
+	y1[t] <- exp(median(rnorm(1000,0,exp(x2[t]))))#
+	#x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(y1,x2))
+nn <- 100#
+#
+y1 <- x2 <- ww <- rnorm(nn,0,0.1)#
+#
+b0 <- -1#
+b1 <- 0.2#
+#
+y1[1] <- exp(rnorm(1,0,exp(x2[1])))#
+for(t in 2:nn) {#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t] + c3[t]#
+	y1[t] <- exp(rnorm(1000,0,exp(x2[t])))#
+	#x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(y1,x2))
+b1 <- 0.3#
+#
+y1[1] <- exp(rnorm(1,0,exp(x2[1])))#
+for(t in 2:nn) {#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t] + c3[t]#
+	y1[t] <- exp(rnorm(1000,0,exp(x2[t])))#
+	#x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(y1,x2))
+b1 <- 0.4#
+#
+y1[1] <- exp(rnorm(1,0,exp(x2[1])))#
+for(t in 2:nn) {#
+	x2[t] <- b0 + b1*(x2[t-1]-b0) + ww[t] + c3[t]#
+	y1[t] <- exp(rnorm(1000,0,exp(x2[t])))#
+	#x3[t] <- b0 + b1*(x3[t-1]) + cc*c3[t] + ww[t]#
+}#
+#
+plot.ts(cbind(y1,x2))
+library(MARSS)#
+load("KvichakSockeye.RData")
+load("/Users/mark.scheuerell/Dropbox/academics/courses/FISH 507 - 2017/Labs/2017 Labs/Week 5 fitting DLMs/ChilkoSockeye.RData")
+ls()
+SRdata

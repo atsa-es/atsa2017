@@ -1,0 +1,14 @@
+\begin{Schunk}
+\begin{Sinput}
+ # create sine wave with trend
+ tt <- sin(2*pi*seq(nn)/12) - seq(nn)/50
+ # set up plot area
+ par(mfrow=c(1,2))
+ # plot line
+ plot.ts(tt, ylab=expression(italic(x[t])))
+ # get ACF
+ sili.acf <- acf(tt, plot=FALSE)
+ # plot ACF
+ plot.acf(sili.acf)
+\end{Sinput}
+\end{Schunk}

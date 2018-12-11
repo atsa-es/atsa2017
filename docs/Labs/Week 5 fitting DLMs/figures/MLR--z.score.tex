@@ -1,0 +1,10 @@
+\begin{Schunk}
+\begin{Sinput}
+ # get regressor variable
+ CUI = SalmonSurvCUI[,3]
+ # z-score the CUI
+ CUI.z = matrix((CUI - mean(CUI))/sqrt(var(CUI)), nrow=1)
+ # number of regr params (slope + intercept)
+ m = dim(CUI.z)[1] + 1
+\end{Sinput}
+\end{Schunk}

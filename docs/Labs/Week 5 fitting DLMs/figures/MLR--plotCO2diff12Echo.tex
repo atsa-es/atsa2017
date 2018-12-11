@@ -1,0 +1,9 @@
+\begin{Schunk}
+\begin{Sinput}
+ # difference the differenced CO2 data
+ co2.D2D12 <- diff(co2.D2, lag=12)
+ # plot the newly differenced data
+ plot(co2.D2D12,
+      ylab=expression(paste(nabla,"(",nabla^2,"CO"[2],")")))
+\end{Sinput}
+\end{Schunk}

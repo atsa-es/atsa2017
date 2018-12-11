@@ -1,0 +1,13 @@
+
+model {  
+   mu ~ dnorm(0, 0.01); 
+   tau.pro ~ dgamma(0.001,0.001); 
+   sd.pro <- 1/sqrt(tau.pro); 
+   phi ~ dnorm(0, 1); 
+   
+   predY[1] <- Y[1];
+   for(i in 2:N) {
+      predY[i] <- mu + phi * Y[i-1]; 
+      Y[i] ~ dnorm(predY[i], tau.pro);
+   }
+}  

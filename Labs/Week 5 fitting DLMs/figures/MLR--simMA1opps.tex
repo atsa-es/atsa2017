@@ -1,0 +1,15 @@
+\begin{Schunk}
+\begin{Sinput}
+ set.seed(123)
+ # list description for MA(1) model with small coef
+ MA.sm <- list(order=c(0,0,1), ma=0.2, sd=0.1)
+ # list description for MA(1) model with large coef
+ MA.lg <- list(order=c(0,0,1), ma=0.8, sd=0.1)
+ # list description for MA(1) model with large coef
+ MA.neg <- list(order=c(0,0,1), ma=-0.5, sd=0.1)
+ # simulate MA(1)
+ MA1.sm <- arima.sim(n=50, model=MA.sm)
+ MA1.lg <- arima.sim(n=50, model=MA.lg)
+ MA1.neg <- arima.sim(n=50, model=MA.neg)
+\end{Sinput}
+\end{Schunk}

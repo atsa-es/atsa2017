@@ -1,0 +1,12 @@
+\begin{Schunk}
+\begin{Sinput}
+ set.seed(456)
+ # list description for AR(1) model with small coef
+ AR.sm <- list(order=c(1,0,0), ar=0.1, sd=0.1)
+ # list description for AR(1) model with large coef
+ AR.lg <- list(order=c(1,0,0), ar=0.9, sd=0.1)
+ # simulate AR(1)
+ AR1.sm <- arima.sim(n=50, model=AR.sm)
+ AR1.lg <- arima.sim(n=50, model=AR.lg)
+\end{Sinput}
+\end{Schunk}

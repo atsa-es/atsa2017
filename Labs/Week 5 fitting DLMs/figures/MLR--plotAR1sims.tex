@@ -1,0 +1,15 @@
+\begin{Schunk}
+\begin{Sinput}
+ # setup plot region
+ par(mfrow=c(1,2))
+ # get y-limits for common plots
+ ylm <- c(min(AR1.sm,AR1.lg), max(AR1.sm,AR1.lg))
+ # plot the ts
+ plot.ts(AR1.sm, ylim=ylm,
+         ylab=expression(italic(x)[italic(t)]),
+         main=expression(paste(phi," = 0.1")))
+ plot.ts(AR1.lg, ylim=ylm,
+         ylab=expression(italic(x)[italic(t)]),
+         main=expression(paste(phi," = 0.9")))
+\end{Sinput}
+\end{Schunk}

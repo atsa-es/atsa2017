@@ -1,0 +1,483 @@
+%\renewcommand{\rightmark}{Homework solutions}
+\SweaveOpts{keep.source=TRUE, prefix.string=../figures/HWUSS-, eps=FALSE, split=FALSE}
+<<RUNFIRST, echo=FALSE>>=
+require(MARSS)
+options(prompt=" ", continue=" ", width=60)
+@
+
+\chapter*{Solutions Chapter \ref{chap:univariate state-space}}
+\addcontentsline{toc}{chapter}{Solutions Chapter \ref{chap:univariate state-space}}
+
+%\chapter{Key and explanations for Homework Week 3}
+\subsection*{Data Set Up}
+<<key-set-up-data>>=
+library(MARSS)
+dat=log(grouse[,2])
+@
+
+
+\subsection*{Problem 1}
+\begin{wideenumerate}
+\item Plot the data.
+<<hw1-fig>>=
+plot(grouse[,1], dat, type="l", ylab="log count", xlab="")
+@
+\begin{figure}[htp]
+\begin{center}
+<<hw1-fig-plot,fig=TRUE,echo=FALSE,width=6,height=3>>=
+par(mar=c(2, 4, 2, 2))
+plot(grouse[,1], dat, type="l", ylab="log count", xlab="")
+@
+\end{center}
+\end{figure}
+\item Fit each model using \verb@MARSS()@.
+<<mod-lists, results=hide>>=
+mod.list1=list(
+  B=matrix(1), U=matrix(0), Q=matrix("q"),
+  Z=matrix(1), A=matrix(0), R=matrix(0),
+  x0=matrix("a"), tinitx=0)
+fit1.marss = MARSS(dat, model=mod.list1)
+
+mod.list2=list(
+  B=matrix(1), U=matrix("u"), Q=matrix("q"),
+  Z=matrix(1), A=matrix(0), R=matrix(0),
+  x0=matrix("a"), tinitx=0)
+fit2.marss = MARSS(dat, model=mod.list2)
+@
+<<mod-res>>=
+coef(fit1.marss, type="vector")
+coef(fit2.marss, type="vector")
+@
+\item Which one appears better supported given AICc?
+<<mod-aics>>=
+c(fit1.marss$AICc, fit2.marss$AICc)
+@
+Model 2 is better supported with a $\Delta AICc$ of \Sexpr{fit2.marss$AICc-fit1.marss$AICc}.
+\item Load the \verb@forecast@ package. Use \verb@auto.arima(dat)@  to fit the data.  Next run \verb@auto.arima@ on the data with \verb@trace=TRUE@ to see all the ARIMA models it compared. 
+<<mod-auto-arima, results=hide>>=
+library(forecast)
+auto.arima(dat)
+@
+Let's look at all the models it tried using \verb@trace=TRUE@.
+<<mod-auto-arima-trace>>=
+auto.arima(dat, trace=TRUE)
+@
+It picked model 2 as the best among those tested.  "ARIMA(0,1,0) with drift" is model 2.  
+
+\item Is the difference in the AICc values between a random walk with and without drift comparable between MARSS() and auto.arima()?
+<<comp-arima-aicc>>=
+fit1.arima=Arima(dat, order=c(0,1,0))
+fit2.arima=Arima(dat, order=c(0,1,0), include.drift=TRUE)
+
+fit2.arima$aicc-fit1.arima$aicc
+fit2.marss$AICc-fit1.marss$AICc
+@
+Similar but not identical.  BTW, to figure how to get AICc from an \verb@Arima()@ fit, I tried \verb@names(fit1.arima)@ and saw that AICc was in the element named \verb@aicc@.
+\end{wideenumerate}
+
+\subsection*{Problem 2}
+This produces $x_t = x_{t-1} + u + w_t$ data with $u=0.1$ and $q=1$.
+<<hw2.data>>=
+dat=cumsum(rnorm(100,0.1,1))
+@
+
+\begin{wideenumerate}
+\item Write out the equation for that random walk as a univariate state-space model. 
+\begin{equation}
+\begin{gathered}
+x_t = x_{t-1} + u + w_t, w_t \sim \N(0,q) \\
+x_0 = \mu \text{ or } x_1 = y_1 \\
+y_t = x_t
+\end{gathered}
+\end{equation}
+where $u=0.1$ and $q=1$.
+\item What is the order of the $\xx$ part of the model written as ARIMA(p, d, q)?  
+
+\smallskip
+From question 1, you should be able to deduce it is ARIMA(0,1,0) but if you said ARIMA(1,0,0) with b=1, that's ok.  That's not how \verb@Arima()@ writes $x_t = x_{t-1} + u + w_t$ but it is correct.
+\item Fit that model using \verb@Arima()@ in the \verb@forecast@ package.  You'll need to specify the \verb@order@ and \verb@include.drift@ term.  
+<<hw2-arima, results=hide>>=
+fit.arima=Arima(dat, order=c(0,1,0), include.drift=TRUE)
+@
+\item Fit that model with \verb@MARSS()@.
+<<hw2-marss, results=hide>>=
+mod.list=list(
+  B=matrix(1), U=matrix("u"), Q=matrix("q"),
+  Z=matrix(1), A=matrix(0), R=matrix(0),
+  x0=matrix("mu"), tinitx=0)
+fit.marss = MARSS(dat, model=mod.list)
+@
+or since I know that $x_1 = y_1$ from the observation model, I could use:
+<<hw2-marss-alt, results=hide>>=
+mod.list.alt=list(
+  B=matrix(1), U=matrix("u"), Q=matrix("q"),
+  Z=matrix(1), A=matrix(0), R=matrix(0),
+  x0=matrix(dat[1]), tinitx=1)
+fit.alt.marss = MARSS(dat, model=mod.list.alt, method="BFGS")
+@
+But hopefully you didn't try that because this makes the likelihood surface flat and you need to use lots more iterations or try a Newton method which happens to help (sometimes it doesn't or makes thing worse).
+\item How are the two estimates different?
+<<hw2-compare-coef>>=
+coef(fit.marss, type="vector")
+coef(fit.alt.marss, type="vector")
+c(coef(fit.arima), s2=fit.arima$sigma2)
+@
+MARSS() is estimating 3 parameters while Arima() is estimating 2.  The $u$ estimates are identical but the $q$ estimate is different.
+
+\smallskip
+\verb@coef()@ is the standard function for getting estimates from fits.  Try \verb@?coef@ to find the help file for \verb@coef@ applied to MARSS objects.  For Arima objects, \verb@coef()@ doesn't return sigma2 (which I discovered by trying \verb@coef(fit.arima)@).  So I did \verb@names(fit.arima)@ and found it was in \verb@fit.arima$sigma2@.
+\end{wideenumerate}
+
+Now fit the first-differenced data:
+<<hw3.data>>=
+diff.dat=diff(dat)
+@
+\begin{wideenumerate}[resume]
+\item If $x_t$ denotes a time series.  What is the first difference of $x$?  What is the second difference?
+
+\smallskip
+First difference \verb@diff(x)@ is $x_t - x_{t-1}$.
+
+Second difference is \verb@diff(diff(x))@ or $(x_t - x_{t-1}) - (x_{t-1} - x_{t-2})$.
+
+\item What is the $\xx$ model for \verb@diff.dat@?
+$$\text{diff}(x)=(x_t - x_{t-1}) = u + w_t$$
+\item Fit \verb@diff.dat@ using \verb@Arima()@. You'll need to change \verb@order@ and \verb@include.mean@.
+<<hw2-fit-diff-dat>>=
+fit.diff.arima=Arima(diff.dat, order=c(0,0,0), include.mean=TRUE)
+@
+\item Fit that model with \verb@MARSS()@.
+
+data ($y$) is now diff.dat and state-space model is 
+\begin{equation}
+\begin{gathered}
+x_t = u + w_t, w_t \sim \N(0,q) \\
+x_0 = \mu \text{ or } x_1 = y_1 \\
+y_t = x_t
+\end{gathered}
+\end{equation}
+<<hw2-fit-diff-marss, results=hide>>=
+mod.list.diff.1=list(
+  B=matrix(0), U=matrix("u"), Q=matrix("q"),
+  Z=matrix(1), A=matrix(0), R=matrix(0),
+  x0=matrix(0), tinitx=0)
+fit.alt.diff.1 = MARSS(diff.dat, model=mod.list.diff.1)
+
+@
+Or we could have written it like so
+\begin{equation}
+\begin{gathered}
+x_t = 0, w_t \sim \N(0,0) \\
+x_0 = 0 \\
+y_t = a + v_t, v_t \sim \N(0,r)
+\end{gathered}
+\end{equation}
+In this case, we fit this model
+<<hw2-fit-diff-marss-2, results=hide>>=
+mod.list.diff.2=list(
+  B=matrix(0), U=matrix(0), Q=matrix(0),
+  Z=matrix(0), A=matrix("u"), R=matrix("r"),
+  x0=matrix(0), tinitx=0)
+fit.alt.diff.2 = MARSS(diff.dat, model=mod.list.diff.2)
+
+@
+Here's the parameter estimates. They are all the same.
+<<hw2-fit-diff-coef>>=
+coef(fit.alt.diff.1, type="vector")
+coef(fit.alt.diff.2, type="vector")
+c(coef(fit.diff.arima), s2=fit.diff.arima$sigma2)
+@
+\end{wideenumerate}
+
+\subsection*{Problem 3}
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{equation}
+x_t = b x_{t-1}+u+w_t \text{ where } w_t \sim \N(0,q)  
+\label{eq:gompertz}\end{equation}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+
+\begin{wideenumerate}
+\item Write R code to simulate Equation \ref{eq:gompertz}.  Make $b$ less than 1 and greater than 0.  Set $u$ and $x_0$ to whatever you want.  You can use a \verb@for@ loop. 
+<<hw3-sim>>=
+#set up my parameter values
+b=.8; u=2; x0=10; q=0.1
+nsim=1000
+#set up my holder for x
+x=rep(NA, nsim)
+x[1]=b*x0+u+rnorm(1,0,sqrt(q))
+for(t in 2:nsim) x[t]=b*x[t-1]+u+rnorm(1,0,sqrt(q))
+@
+
+\item Plot the trajectories and show that this model does not ``drift'' upward or downward.  It fluctuates about a mean value.
+<<hw3-fig>>=
+plot(x, type="l",xlab="", ylab="x")
+@
+\begin{figure}[htp]
+\begin{center}
+<<hw3-fig-plot,fig=TRUE,echo=FALSE,width=6,height=3>>=
+par(mar=c(2, 4, 2, 2))
+plot(x, type="l",xlab="", ylab="x", ylim=c(-6+u/(1-b),6+u/(1-b)))
+@
+\end{center}
+\end{figure}
+
+\item Hold $b$ constant and change $u$.  How do the trajectories change?
+<<hw3-sim>>=
+#set up my parameter values
+u2=u+1
+x2=rep(NA, nsim)
+x2[1]=b*x0+u2+rnorm(1,0,sqrt(q))
+for(t in 2:nsim) x2[t]=b*x2[t-1]+u2+rnorm(1,0,sqrt(q))
+#second u
+u3=u-1
+x3=rep(NA, nsim)
+x3[1]=b*x0+u3+rnorm(1,0,sqrt(q))
+for(t in 2:nsim) x3[t]=b*x3[t-1]+u3+rnorm(1,0,sqrt(q))
+
+@
+\begin{figure}[htp]
+\begin{center}
+<<hw3-fig-plot2,fig=TRUE,echo=FALSE,width=6,height=3>>=
+par(mar=c(2, 4, 2, 2))
+plot(x, type="l",xlab="", ylab="x", ylim=c(-6+u/(1-b),6+u/(1-b)))
+lines(x2, col="blue")
+lines(x3, col="red")
+legend("bottomright", c("u+1","u-1"), col=c("blue", "red"), lty=1, bg="white")
+@
+\end{center}
+\end{figure}
+$u$ moves the mean of the trajectories up or down.
+
+
+\item Hold $u$ constant and change $b$.  Make sure to use a $b$ close to 1 and another close to 0. How do the trajectories change?
+<<hw3-sim2>>=
+#set up my parameter values
+b1=0.9
+x0=u/(1-b1)
+x1=rep(NA, nsim)
+x1[1]=b1*x0+u+rnorm(1,0,sqrt(q))
+for(t in 2:nsim) x1[t]=b1*x1[t-1]+u+rnorm(1,0,sqrt(q))
+# second b
+b2=0.1
+x0=u/(1-b2)
+x2=rep(NA, nsim)
+x2[1]=b2*x0+u+rnorm(1,0,sqrt(q))
+for(t in 2:nsim) x2[t]=b2*x2[t-1]+u+rnorm(1,0,sqrt(q))
+@
+\begin{figure}[htp]
+\begin{center}
+<<hw3-fig-plot3,fig=TRUE,echo=FALSE,width=6,height=3>>=
+par(mfrow=c(1,2), mar=c(2,2,2,1))
+plot(x1, type="l",xlab="", ylab="x", main="b=0.9")
+plot(x2, type="l",xlab="", ylab="x", main="b=0.1")
+@
+\end{center}
+\end{figure}
+The one with smaller $b$ has less auto-regression and is `tighter' (explores less of a range of the y axis).
+
+\item Do 2 simulations each with the same $w_t$.  In one simulation, set $u=1$ and in the other $u=2$.  For both simulations, set $x_1 = u/(1-b)$.  You can set $b$ to whatever you want as long as $0<b<1$.  Plot the 2 trajectories on the same plot.  What is different?
+
+<<hw3-sim3>>=
+#set up my parameter values
+b=0.9
+u=1
+x0=u/(1-b)
+err=rnorm(nsim,0,sqrt(q))
+x1=rep(NA, nsim)
+x1[1]=b*x0+u+err[1]
+for(t in 2:nsim) x1[t]=b*x1[t-1]+u+err[t]
+# second u
+u=2
+x0=u/(1-b)
+x2=rep(NA, nsim)
+x2[1]=b*x0+u+err[1]
+for(t in 2:nsim) x2[t]=b*x2[t-1]+u+err[t]
+@
+\begin{figure}[htp]
+\begin{center}
+<<hw3-fig-plot4,fig=TRUE,echo=FALSE,width=6,height=3>>=
+par(mfrow=c(1,2), mar=c(2,2,2,1))
+plot(x1, type="l",xlab="", ylab="x", main="u=1")
+plot(x2, type="l",xlab="", ylab="x", main="u=2")
+@
+\end{center}
+\end{figure}
+They are exactly the same except that the mean has changed from $1/(1-b)$ to $2/(1-b)$.  The mean level in the AR-1 model $x_t = b x_{t-1} + u + w_t$ is $u/(1-b)$.  For a given $b$, $u$ just changes the level.
+\end{wideenumerate}
+
+
+\subsection*{Problem 4}
+The MARSS package includes a data set of gray whales.  Load the data to use as follows:
+<<hw4>>=
+library(MARSS)
+dat=log(graywhales[,2])
+@
+
+Fit a random walk with drift model observed with error to the data:
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{equation}
+\begin{gathered}
+x_t = x_{t-1}+u+w_t \text{ where } w_t \sim \N(0,q) \\
+y_t = x_t+v_t \text{ where } v_t \sim \N(0,r) \\
+x_0 = a 
+\end{gathered}   
+\label{eq:marss.rw.w.drift}\end{equation}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+$y$ is the whale count in year $t$. $x$ is interpreted as the 'true' unknown population size that we are trying to estimate.
+
+\begin{wideenumerate}
+\item Fit this model with \verb@MARSS()@
+<<hw4-fit, results=hide>>=
+mod.list=list(
+  B=matrix(1), U=matrix("u"), Q=matrix("q"),
+  Z=matrix(1), A=matrix(0), R=matrix("r"),
+  x0=matrix("mu"), tinitx=0)
+fit.marss = MARSS(dat, model=mod.list)
+@
+
+\item Plot the estimated $x$ as a line with the actual counts added as points.
+\begin{figure}[htp]
+\begin{center}
+<<hw4-fig-plot1,fig=TRUE,echo=TRUE,width=6,height=3>>=
+par(mar=c(2,2,2,2))
+plot(graywhales[,1], fit.marss$states[1,], type="l",xlab="", ylab="log count")
+points(graywhales[,1], dat)
+@
+\end{center}
+\end{figure}
+
+\item Simulate 1000 sample trajectories using the estimated $u$ and $q$ starting at the estimated $x$ in 1997.  You can do this with a couple \verb@for@ loops or write something terse with \verb@cumsum@ and \verb@apply@.
+<<hw4-sim>>=
+#1997 is the 39th (last) data point
+x0=fit.marss$states[1,39]
+q = coef(fit.marss)$Q
+u = coef(fit.marss)$U
+#next question asks for pop size in 2007 so nforeward=10
+nsim=1000
+nforeward = 10
+#each row holds a simulation
+x=matrix(NA, nsim, nforeward)
+x[,1]=x0+u+rnorm(nsim,0,sqrt(q))
+for(t in 2:nforeward) x[,t]=x[,t-1]+u+rnorm(nsim,0,sqrt(q))
+@
+\item Using this what is your estimated probability of reaching 50,000 graywhales in 2007.
+
+\smallskip
+The question was phrased a big vaguely.  It does not specify if this means ``in 2007, x=log(50000)'', ``at some point by or before 2007, x reaches log(50000) at least once'', or ``in 2007, the population is at least 50000 whales''.  I was thinking of the last one, but as long as you stated what you were trying to estimate, you were fine.
+<<hw4-prob>>=
+#I just want the fraction of simulations that were 50,000 or above in 2007
+xthresh = log(50000)
+sum(x[,10]<=xthresh)/nsim
+@
+\item What kind of uncertainty does that estimate NOT include?
+\smallskip
+By using the point estimates of $u$, $q$ and $x_0$, we are not including the uncertainty in those estimates in our forecasts.
+\end{wideenumerate}
+
+\subsection*{Problem 5}
+Fit the following 3 models to the graywhales data using MARSS(): 
+\begin{enumerate}
+\item Process error only model with drift
+\item Process error only model without drift
+\item Process error with drift and observation error with observation error variance fixed = 0.05. 
+\end{enumerate}
+Process error only with drift. $x_t = x_{t-1} + u + w_t$ with $y_t = x_t$.
+<<hw5-fit1, results=hide>>=
+mod.list=list(
+  B=matrix(1), U=matrix("u"), Q=matrix("q"),
+  Z=matrix(1), A=matrix(0), R=matrix(0),
+  x0=matrix("mu"), tinitx=0)
+fit.whales1 = MARSS(dat, model=mod.list)
+@
+Process error only without drift. $x_t = x_{t-1} + w_t$ with $y_t = x_t$.
+<<hw5-fit2, results=hide>>=
+mod.list=list(
+  B=matrix(1), U=matrix(0), Q=matrix("q"),
+  Z=matrix(1), A=matrix(0), R=matrix(0),
+  x0=matrix("mu"), tinitx=0)
+fit.whales2 = MARSS(dat, model=mod.list)
+@
+Process error only with drift. $x_t = x_{t-1} + w_t$ with $y_t = x_t+v_t, v_t \sim N(0,0.05)$.
+<<hw5-fit3, results=hide>>=
+mod.list=list(
+  B=matrix(1), U=matrix("u"), Q=matrix("q"),
+  Z=matrix(1), A=matrix(0), R=matrix(0.05),
+  x0=matrix("mu"), tinitx=0)
+fit.whales3 = MARSS(dat, model=mod.list)
+@
+\begin{wideenumerate}
+\item Compute the AICc's for each model and likelihood or deviance (-2 * log likelihood)
+<<hw5-aicc>>=
+c(fit.whales1$AICc, fit.whales2$AICc, fit.whales3$AICc)
+c(fit.whales1$logLik, fit.whales2$logLik, fit.whales3$logLik)
+@
+
+\item Calculate a table of delta-AICc values and AICc weights. 
+<<hw5-aicc-table>>=
+AICc=c(fit.whales1$AICc, fit.whales2$AICc, fit.whales3$AICc)
+delAIC = AICc-min(AICc)
+relLik = exp(-0.5*delAIC)
+aic.table=data.frame(
+  AICc = AICc,
+  delAICc = delAIC,
+  relLik = relLik/sum(relLik)
+)
+rownames(aic.table) = c(
+  "proc only with drift", 
+  "proc only no drift", 
+  "proc with drift and obs error")
+round(aic.table, digits=3)
+@
+There is not much data support for including observation error with $r=0.05$.  But that is because $r=0.05$ is too big.  If we'd estimated $r$, like in problem 4, $r=$\Sexpr{round(fit.marss$par$R, digits=2)}.  With this $r$, the process error with drift and observation error model would be best (AICc=\Sexpr{round(fit.marss$AICc,digits=2)}).
+\end{wideenumerate}
+
+\subsection*{Problem 6}
+Fit the following four models and calculate the MASE statistic for each (using the forecasts for the 3 data points): ARIMA(0,0,0), ARIMA(1,0,0), ARIMA(0,0,1), ARIMA(1,0,1). Present them in a table similar to what Eric showed in lecture. 
+
+Load the data to use as follows and set up so you can use the last 3 data points to validate your fits. 
+<<hw5-data>>=
+require(forecast)
+dat=log(airmiles)
+n = length(dat)
+training.dat = dat[1:(length(airmiles)-3)]
+test.dat = dat[(length(airmiles)-2):n]
+@
+
+First fit the models with \verb@Arima@:
+<<hw6-fit>>=
+fit.1=Arima(training.dat, order =c(0,0,0))
+fit.2=Arima(training.dat, order =c(1,0,0))
+fit.3=Arima(training.dat, order =c(0,0,1))
+fit.4=Arima(training.dat, order =c(1,0,1))
+@
+Then forecast forward 3 steps with the fits (output shown for forecast 1):
+<<hw6-forecast>>=
+forecast.1=forecast(fit.1, h=3)
+forecast.2=forecast(fit.2, h=3)
+forecast.3=forecast(fit.3, h=3)
+forecast.4=forecast(fit.4, h=3)
+forecast.1
+@
+Then you can use the accuracy function to calculate the MASE statistic. 
+<<hw-accuracy-1>>=
+accuracy(forecast.1, test.dat)
+@
+The MASE statistic we want is in the Test set row and MASE column.  We will put the MASE statistics together in a table.
+<<hw6-table>>=
+MASEs = c(
+  accuracy(forecast.1, test.dat)["Test set","MASE"],
+  accuracy(forecast.2, test.dat)["Test set","MASE"],
+  accuracy(forecast.3, test.dat)["Test set","MASE"],
+  accuracy(forecast.4, test.dat)["Test set","MASE"]
+)
+data.frame(
+  name=paste("Arima",c("(0,0,0)","(1,0,0)","(0,0,1)","(1,0,1)"),sep=""), 
+  MASE=MASEs
+  )
+@
+What this shows is that the ARMA(1,0,1) is the best, and the AR component strongly improves predictions
+
+<<reset, echo=FALSE, include.source=FALSE>>=
+options(prompt="> ", continue=" +", width=120)
+@

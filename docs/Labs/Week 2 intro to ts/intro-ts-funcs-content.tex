@@ -1,0 +1,78 @@
+
+
+\chapter{Introduction to basic time series functions in \texttt{R}}
+\label{chap:introTS}
+\chaptermark{Introduction to time series in \texttt{R}}
+
+This chapter introduces you to some of the basic functions in \texttt{R} for plotting and analyzing univariate time series data.  Many of the things you learn here will be relevant when we start examining multivariate time series as well.  We will begin with the creation and plotting of time series objects in \texttt{R}, and then moves on to decomposition, differencing, and correlation (\emph{e.g.}, ACF, PACF) before ending with fitting and simulation of ARMA models.
+
+%==========================
+\section{Time series plots}
+%==========================
+
+Time series plots are an excellent way to begin the process of understanding what sort of process might have generated the data of interest.  Traditionally, time series have been plotted with the observed data on the $y$-axis and time on the $x$-axis.  Sequential time points are usually connected with some form of line, but sometimes other plot forms can be a useful way of conveying important information in the time series (\emph{e.g.}, barplots of sea-surface temperature anomolies show nicely the contrasting El Ni{\~n}o and La Ni{\~n}a phenomena).
+
+Let's start by importing some data; the record of the atmospheric concentration of CO$_2$ collected at the Mauna Loa Observatory in Hawai'i makes a nice example.  The data file contains some extra information that we don't need, so we'll only read in a subset of the columns (\emph{i.e.}, 1, 2 \& 5).
+
+\begin{Schunk}
+\begin{Sinput}
+ ## get CO2 data from Mauna Loa observatory
+ ww1 <- "ftp://aftp.cmdl.noaa.gov/products/"
+ ww2 <- "trends/co2/co2_mm_mlo.txt"
+ CO2 <- read.table(text=getURL(paste0(ww1,ww2)), skip=3, header=TRUE)[,c(1,2,5)]
+ ## assign better column names
+ colnames(CO2) <- c("year","month","ppm")
+\end{Sinput}
+\end{Schunk}
+%------------------------------------------------------
+\subsection{\texttt{ts} objects and \texttt{plot.ts}}
+%------------------------------------------------------
+
+The data are now stored in \texttt{R} as a \texttt{data.frame}, but we would like to transform the class to a more user-friendly format for dealing with time series.  Fortunately, the \texttt{ts} function will do just that, and return an object of class \texttt{ts} as well.  In addition to the data themselves, we need to provide \texttt{ts} with 2 pieces of information about the time index for the data.
+
+The first, \texttt{frequency}, is a bit of a misnomer because it does not really refer to the number of cycles per unit time, but rather the number of observations/samples per cycle.  So, for example, if the data were collected each hour of a day then \texttt{frequency=24}.
+
+The second, \texttt{start}, specifies the first sample in terms of ($day$, $hour$), ($year$, $month$), etc.  So, for example, if the data were collected monthly beginning in November of 1969, then \texttt{frequency=12} and \texttt{start=c(1969,11)}.  If the data were collected annually, then you simply specify \texttt{start} as a scalar (\emph{e.g.}, \texttt{start=1991}) and omit \texttt{frequency} (\emph{i.e.}, \texttt{R} will set \texttt{frequency=1} by default).
+
+The Mauna Loa time series is collected monthly and begins in March of 1958, which we can get from the data themselves, and then pass to \texttt{ts}:
+
+\begin{Schunk}
+\begin{Sinput}
+ ## create a time series (ts) object from the CO2 data
+ co2 <- ts(data=CO2$ppm, frequency=12,
+           start=c(CO2[1,"year"],CO2[1,"month"]))
+\end{Sinput}
+\end{Schunk}
+
+
+Now let's plot the data using \texttt{plot.ts}, which is designed specifically for \texttt{ts} objects like the one we just created above.  It's nice because we don't need to specify any $x$-values as they are taken directly from the \texttt{ts} object.
+
+\begin{Schunk}
+\begin{Sinput}
+ ## plot the ts
+ plot.ts(co2, ylab=expression(paste("CO"[2]," (ppm)")))
+\end{Sinput}
+\end{Schunk}
+
+\begin{figure}[htp]
+\begin{center}
+\includegraphics{../figures/TS--plotdata1}
+\end{center}
+\caption{Time series of the atmospheric CO$_2$ concentration at Mauna Loa, Hawai'i measured monthly from March 1958 to present.}
+\label{fig:LW1.CO2data}
+\end{figure}
+
+Examination of the plotted time series (Figure \ref{fig:LW1.CO2data}) shows 2 obvious features that would violate any assumption of stationarity: 1) an increasing (and perhaps non-linear) trend over time, and 2) strong seasonal patterns. (\emph{Aside}: Do you know the causes of these 2 phenomena?)
+
+%---------------------------------------------------------------
+\subsection{Combining and plotting multiple \texttt{ts} objects}
+%---------------------------------------------------------------
+
+Before we examine the CO$_2$ data further, however, let's see a quick example of how you can combine and plot multiple time series together. We'll begin by getting a second time series (monthly mean temperature anomolies for the Northern Hemisphere) and convert them to a \texttt{ts} object.
+
+\begin{Schunk}
+\begin{Sinput}
+ ## get N Hemisphere land & ocean temperature anomalies from NOAA
+ ww1 <- "http://www.ncdc.noaa.gov/cag/time-series/"
+ ww2 <- "global/nhem/land_ocean/p12/12/1880-2014.csv"
+ Temp <- read.table(paste0(ww1,ww2), skip=3)

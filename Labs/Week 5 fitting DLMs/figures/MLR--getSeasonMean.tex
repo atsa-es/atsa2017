@@ -1,0 +1,8 @@
+\begin{Schunk}
+\begin{Sinput}
+ # create ts object for season
+ co2.seas <- ts(rep(mm, periods+1)[seq(ll)],
+                start=start(co2.1T), 
+                frequency=ff)
+\end{Sinput}
+\end{Schunk}

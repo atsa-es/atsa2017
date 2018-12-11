@@ -1,0 +1,14 @@
+\begin{Schunk}
+\begin{Sinput}
+ plot.acf <- function(ACFobj) {
+   rr <- ACFobj$acf[-1]
+   kk <- length(rr)
+   nn <- ACFobj$n.used
+   plot(seq(kk),rr,type="h",lwd=2,yaxs="i",xaxs="i",
+        ylim=c(floor(min(rr)),1),xlim=c(0,kk+1),
+        xlab="Lag",ylab="Correlation",las=1)
+   abline(h=-1/nn+c(-2,2)/sqrt(nn),lty="dashed",col="blue")
+   abline(h=0)
+ }                                                                                                            
+\end{Sinput}
+\end{Schunk}

@@ -1,0 +1,12 @@
+
+model {  
+   mu ~ dnorm(0, 0.01); 
+   beta ~ dnorm(0,0.01);
+   tau.obs ~ dgamma(0.001,0.001); 
+   sd.obs <- 1/sqrt(tau.obs); 
+   
+   for(i in 1:N) {
+      predY[i] <- mu + C[i]*beta; 
+      Y[i] ~ dnorm(predY[i], tau.obs);
+   }
+}  

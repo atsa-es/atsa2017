@@ -1,0 +1,1540 @@
+\SweaveOpts{keep.source=TRUE, prefix.string=../figures/TS-, eps=FALSE, split=FALSE}
+<<RUNFIRST, echo=FALSE>>=
+require(xtable)
+require(forecast)
+require(RCurl)
+require(stringr)
+tabledir="../figures/"
+options(prompt=" ", continue=" ", width=60)
+@
+
+\chapter{Introduction to basic time series functions in \texttt{R}}
+\label{chap:introTS}
+\chaptermark{Introduction to time series in \texttt{R}}
+
+This chapter introduces you to some of the basic functions in \texttt{R} for plotting and analyzing univariate time series data.  Many of the things you learn here will be relevant when we start examining multivariate time series as well.  We will begin with the creation and plotting of time series objects in \texttt{R}, and then moves on to decomposition, differencing, and correlation (\emph{e.g.}, ACF, PACF) before ending with fitting and simulation of ARMA models.
+
+%==========================
+\section{Time series plots}
+%==========================
+
+Time series plots are an excellent way to begin the process of understanding what sort of process might have generated the data of interest.  Traditionally, time series have been plotted with the observed data on the $y$-axis and time on the $x$-axis.  Sequential time points are usually connected with some form of line, but sometimes other plot forms can be a useful way of conveying important information in the time series (\emph{e.g.}, barplots of sea-surface temperature anomolies show nicely the contrasting El Ni{\~n}o and La Ni{\~n}a phenomena).
+
+Let's start by importing some data; the record of the atmospheric concentration of CO$_2$ collected at the Mauna Loa Observatory in Hawai'i makes a nice example.  The data file contains some extra information that we don't need, so we'll only read in a subset of the columns (\emph{i.e.}, 1, 2 \& 5).
+
+<<CO2data, echo=TRUE, eval=TRUE>>=
+## get CO2 data from Mauna Loa observatory
+ww1 <- "ftp://aftp.cmdl.noaa.gov/products/"
+ww2 <- "trends/co2/co2_mm_mlo.txt"
+CO2 <- read.table(text=getURL(paste0(ww1,ww2)))[,c(1,2,5)]
+## assign better column names
+colnames(CO2) <- c("year","month","ppm")
+@
+<<CO2data.load, echo=FALSE, eval=FALSE>>=
+CO2 <- read.csv("CO2_data.csv")
+@
+%------------------------------------------------------
+\subsection{\texttt{ts} objects and \texttt{plot.ts}}
+%------------------------------------------------------
+
+The data are now stored in \texttt{R} as a \texttt{data.frame}, but we would like to transform the class to a more user-friendly format for dealing with time series.  Fortunately, the \texttt{ts} function will do just that, and return an object of class \texttt{ts} as well.  In addition to the data themselves, we need to provide \texttt{ts} with 2 pieces of information about the time index for the data.
+
+The first, \texttt{frequency}, is a bit of a misnomer because it does not really refer to the number of cycles per unit time, but rather the number of observations/samples per cycle.  So, for example, if the data were collected each hour of a day then \texttt{frequency=24}.
+
+The second, \texttt{start}, specifies the first sample in terms of ($day$, $hour$), ($year$, $month$), etc.  So, for example, if the data were collected monthly beginning in November of 1969, then \texttt{frequency=12} and \texttt{start=c(1969,11)}.  If the data were collected annually, then you simply specify \texttt{start} as a scalar (\emph{e.g.}, \texttt{start=1991}) and omit \texttt{frequency} (\emph{i.e.}, \texttt{R} will set \texttt{frequency=1} by default).
+
+The Mauna Loa time series is collected monthly and begins in March of 1958, which we can get from the data themselves, and then pass to \texttt{ts}:
+
+<<CO2ts, echo=TRUE, eval=TRUE>>=
+## create a time series (ts) object from the CO2 data
+co2 <- ts(data=CO2$ppm, frequency=12,
+          start=c(CO2[1,"year"],CO2[1,"month"]))
+@
+
+
+Now let's plot the data using \texttt{plot.ts}, which is designed specifically for \texttt{ts} objects like the one we just created above.  It's nice because we don't need to specify any $x$-values as they are taken directly from the \texttt{ts} object.
+
+<<plotdataPar1, eval=FALSE, echo=TRUE>>=
+## plot the ts
+plot.ts(co2, ylab=expression(paste("CO"[2]," (ppm)")))
+@
+
+\begin{figure}[htp]
+\begin{center}
+<<plotdata1, eval=TRUE, echo=FALSE, fig=TRUE, height=3>>=
+## set the margins & text size
+par(mar=c(4,4,1,1), oma=c(0,0,0,0), cex=1)
+## plot the ts
+plot.ts(co2, ylab=expression(paste("CO"[2]," (ppm)")))
+@
+\end{center}
+\caption{Time series of the atmospheric CO$_2$ concentration at Mauna Loa, Hawai'i measured monthly from March 1958 to present.}
+\label{fig:LW1.CO2data}
+\end{figure}
+
+Examination of the plotted time series (Figure \ref{fig:LW1.CO2data}) shows 2 obvious features that would violate any assumption of stationarity: 1) an increasing (and perhaps non-linear) trend over time, and 2) strong seasonal patterns. (\emph{Aside}: Do you know the causes of these 2 phenomena?)
+
+%---------------------------------------------------------------
+\subsection{Combining and plotting multiple \texttt{ts} objects}
+%---------------------------------------------------------------
+
+Before we examine the CO$_2$ data further, however, let's see a quick example of how you can combine and plot multiple time series together. We'll begin by getting a second time series (monthly mean temperature anomolies for the Northern Hemisphere) and convert them to a \texttt{ts} object.
+
+<<Temp_data, echo=TRUE, eval=TRUE>>=
+## get N Hemisphere land & ocean temperature anomalies from NOAA
+ww1 <- "https://www.ncdc.noaa.gov/cag/time-series/"
+ww2 <- "global/nhem/land_ocean/p12/12/1880-2014.csv"
+Temp <- read.csv(text=getURL(paste0(ww1,ww2)), skip=3)
+## create ts object
+tmp <- ts(data=Temp$Value, frequency=12, start=c(1880,1))
+@
+<<Temp_data_offline, echo=FALSE, eval=FALSE>>=
+## load N Hemisphere land & ocean temperature anomalies
+Temp <- read.csv("Temp_data.csv")
+## create ts object
+tmp <- ts(data=Temp$Value, frequency=12, start=c(1880,1))
+@
+
+Before we can plot the two time series together, however, we need to line up their time indices because the temperature data start in January of 1880, but the CO$_2$ data start in March of 1958.  Fortunately, the \texttt{ts.intersect} function makes this really easy once the data have been transformed to \texttt{ts} objects by trimming the data to a common time frame.  Also, \texttt{ts.union} works in a similar fashion, but it pads one or both series with the appropriate number of NA's.  Let's try both.
+
+<<alignData, echo=TRUE, eval=TRUE>>=
+## intersection (only overlapping times)
+datI <- ts.intersect(co2,tmp)
+## dimensions of common-time data
+dim(datI)
+## union (all times)
+datU <- ts.union(co2,tmp)
+## dimensions of all-time data
+dim(datU)
+@
+
+\noindent As you can see, the intersection of the two data sets is much smaller than the union.  If you compare them, you will see that the first 938 rows of \texttt{datU} contains \texttt{NA} in the \texttt{co2} column.
+
+It turns out that the regular \texttt{plot} function in \texttt{R} is smart enough to recognize a \texttt{ts} object and use the information contained therein appropriately.  Here's how to plot the intersection of the two time series together with the y-axes on alternate sides (results are shown in Figure \ref{fig:LW1.fig2}):
+
+<<plotdataPar2, eval=FALSE, echo=TRUE>>=
+## plot the ts
+plot(datI, main="", yax.flip=TRUE)
+@
+
+\begin{figure}[htp]
+\begin{center}
+<<plotdata2, eval=TRUE, echo=FALSE, fig=TRUE, height=5>>=
+## set the margins & text size
+par(mar=c(4,4,1,1), oma=c(0,0,0,0), cex=1)
+## plot the ts
+plot(datI, main="", yax.flip=TRUE)
+@
+\end{center}
+\caption{Time series of the atmospheric CO$_2$ concentration at Mauna Loa, Hawai'i (top) and the mean temperature index for the Northern Hemisphere (bottom) measured monthly from March 1958 to present.}
+\label{fig:LW1.fig2}
+\end{figure}
+
+%=====================================
+\section{Decomposition of time series}
+%=====================================
+
+Plotting time series data is an important first step in analyzing their various components.  Beyond that, however, we need a more formal means for identifying and removing characteristics such as a trend or seasonal variation.  As discussed in lecture, the decomposition model reduces a time series into 3 components: trend, seasonal effects, and random errors.  In turn, we aim to model the random errors as some form of stationary process.
+
+Let's begin with a simple, additive decomposition model for a time series $x_t$
+
+\begin{equation}\label{eqn:classDecomp}
+x_t = m_t + s_t + e_t,
+\end{equation}
+
+\noindent where, at time $t$, $m_t$ is the trend, $s_t$ is the seasonal effect, and $e_t$ is a random error that we generally assume to have zero-mean and to be correlated over time.  Thus, by estimating and subtracting both $\{m_t\}$ and $\{s_t\}$ from $\{x_t\}$, we hope to have a time series of stationary residuals $\{e_t\}$.
+
+%-----------------------------
+\subsection{Estimating trends}
+%-----------------------------
+
+In lecture we discussed how linear filters are a common way to estimate trends in time series.  One of the most common linear filters is the moving average, which for time lags from $-a$ to $a$ is defined as
+
+\begin{equation}\label{eqn:linearFilter}
+\hat{m}_t = \sum_{k=-a}^{a} \left(\frac{1}{1+2a}\right) x_{t+k}.
+\end{equation}
+
+\noindent This model works well for moving windows of odd-numbered lengths, but should be adjusted for even-numbered lengths by adding only $\frac{1}{2}$ of the 2 most extreme lags so that the filtered value at time $t$ lines up with the original observation at time $t$.  So, for example, in a case with monthly data such as the atmospheric CO$_2$ concentration where a 12-point moving average would be an obvious choice, the linear filter would be
+
+\begin{equation}\label{eqn:linearFilterEx}
+\hat{m}_t = \frac{\frac{1}{2}x_{t-6} + x_{t-5} + \dots + x_{t-1} + x_t + x_{t+1} + \dots + x_{t+5} + \frac{1}{2}x_{t+6}}{12}
+\end{equation}
+
+\noindent It is important to note here that our time series of the estimated trend $\{\hat{m}_t\}$ is actually shorter than the observed time series by $2a$ units.
+
+Conveniently, \texttt{R} has the built-in function \texttt{filter} for estimating moving-average (and other) linear filters.  In addition to specifying the time series to be filtered, we need to pass in the filter weights (and 2 other arguments we won't worry about here--type \verb@?filter@ to get more information).  The easiest way to create the filter is with the \texttt{rep} function:
+
+<<makeFilter, eval=TRUE, echo=TRUE>>=
+## weights for moving avg
+fltr <- c(1/2,rep(1,times=11),1/2)/12
+@
+
+Now let's get our estimate of the trend $\{\hat{m}\}$ with \texttt{filter} and plot it:
+
+<<plotTrendTSa, eval=FALSE, echo=TRUE>>=
+## estimate of trend
+co2.trend <- filter(co2, filter=fltr, method="convo", sides=2)
+## plot the trend
+plot.ts(co2.trend, ylab="Trend", cex=1)
+@
+
+\noindent The trend is a more-or-less smoothly increasing function over time, the average slope of which does indeed appear to be increasing over time as well (Figure \ref{fig:LW1.figTrendTS}).
+
+\begin{figure}[htp]
+\begin{center}
+<<plotTrendTSb, eval=TRUE, echo=FALSE, fig=TRUE, height=3>>=
+## estimate of trend
+co2.trend <- filter(co2, filter=fltr, method="convo", sides=2)
+## set the margins & text size
+par(mar=c(4,4,1,1), oma=c(0,0,0,0), cex=1)
+## plot the ts
+plot.ts(co2.trend, ylab="Trend", cex=1)
+@
+\end{center}
+\caption{Time series of the estimated trend $\{\hat{m}_t\}$ for the atmospheric CO$_2$ concentration at Mauna Loa, Hawai'i.}
+\label{fig:LW1.figTrendTS}
+\end{figure}
+
+%---------------------------------------
+\subsection{Estimating seasonal effects}
+%---------------------------------------
+
+Once we have an estimate of the trend for time $t$ ($\hat{m}_t$) we can easily obtain an estimate of the seasonal effect at time $t$ ($\hat{s}_t$) by subtraction
+
+\begin{equation}\label{eqn:seasEst}
+\hat{s}_t = x_t - \hat{m}_t,
+\end{equation}
+
+\noindent which is really easy to do in \texttt{R}:
+
+<<getSeason, eval=TRUE, echo=TRUE>>=
+## seasonal effect over time
+co2.1T <- co2 - co2.trend
+@
+
+This estimate of the seasonal effect for each time $t$ also contains the random error $e_t$, however, which can be seen by plotting the time series and careful comparison of Equations \eqref{eqn:classDecomp} and \eqref{eqn:seasEst}.
+
+<<plotSeasTSa, eval=FALSE, echo=TRUE>>=
+## plot the monthly seasonal effects
+plot.ts(co2.1T, ylab="Seasonal effect", xlab="Month", cex=1)
+@
+
+\begin{figure}[htp]
+\begin{center}
+<<plotSeasTSb, eval=TRUE, echo=FALSE, fig=TRUE, height=3>>=
+## set the margins & text size
+par(mar=c(4,4,1,1), oma=c(0,0,0,0), cex=1)
+## plot the ts
+plot.ts(co2.1T, ylab="Seasonal effect plus errors", xlab="Month", cex=1)
+@
+\end{center}
+\caption{Time series of seasonal effects plus random errors for the atmospheric CO$_2$ concentration at Mauna Loa, Hawai'i, measured monthly from March 1958 to present.}
+\label{fig:LW1.figSeasTS}
+\end{figure}
+
+We can obtain the overall seasonal effect by averaging the estimates of $\{\hat{s}_t\}$ for each month and repeating this sequence over all years.
+
+<<getSeasonTS, eval=TRUE, echo=TRUE>>=
+## length of ts
+ll <- length(co2.1T)
+## frequency (ie, 12)
+ff <- frequency(co2.1T)
+## number of periods (years); %/% is integer division
+periods <- ll %/% ff
+## index of cumulative month
+index <- seq(1,ll,by=ff) - 1
+## get mean by month
+mm <- numeric(ff)
+for(i in 1:ff) {
+  mm[i] <- mean(co2.1T[index+i], na.rm=TRUE)
+}
+## subtract mean to make overall mean=0
+mm <- mm - mean(mm)
+@
+
+Before we create the entire time series of seasonal effects, let's plot them for each month to see what is happening within a year:
+
+<<plotdataPar3, eval=FALSE, echo=TRUE>>=
+## plot the monthly seasonal effects
+plot.ts(mm, ylab="Seasonal effect", xlab="Month", cex=1)
+@
+
+\noindent It looks like, on average, that the CO$_2$ concentration is highest in spring (March) and lowest in summer (August) (Figure \ref{fig:LW1.fig3}).  (\emph{Aside}: Do you know why this is?)
+
+\begin{figure}[htp]
+\begin{center}
+<<plotSeasMean, eval=TRUE, echo=FALSE, fig=TRUE, height=3>>=
+## set the margins & text size
+par(mar=c(4,4,1,1), oma=c(0,0,0,0), cex=1)
+## plot the ts
+plot.ts(mm, ylab="Seasonal effect", xlab="Month", cex=1)
+@
+\end{center}
+\caption{Estimated monthly seasonal effects for the atmospheric CO$_2$ concentration at Mauna Loa, Hawai'i.}
+\label{fig:LW1.fig3}
+\end{figure}
+
+Finally, let's create the entire time series of seasonal effects $\{\hat{s}_t\}$:
+
+<<getSeasonMean, eval=TRUE, echo=TRUE>>=
+## create ts object for season
+co2.seas <- ts(rep(mm, periods+1)[seq(ll)],
+               start=start(co2.1T), 
+               frequency=ff)
+@
+
+%--------------------------------
+\subsection{Completing the model}
+%--------------------------------
+
+The last step in completing our full decomposition model is obtaining the random errors $\{\hat{e}_t\}$, which we can get via simple subtraction
+
+\begin{equation}\label{eqn:errorEst}
+\hat{e}_t = x_t - \hat{m}_t - \hat{s}_t.
+\end{equation}
+
+\noindent Again, this is really easy in \texttt{R}:
+
+<<getError, eval=TRUE, echo=TRUE>>=
+## random errors over time
+co2.err <- co2 - co2.trend - co2.seas
+@
+  
+Now that we have all 3 of our model components, let's plot them together with the observed data $\{x_t\}$.  The results are shown in Figure \ref{fig:LW1.figALL}.
+
+<<plotdataPar4, eval=FALSE, echo=TRUE>>=
+## plot the obs ts, trend & seasonal effect
+plot(cbind(co2,co2.trend,co2.seas,co2.err),main="",yax.flip=TRUE)
+@
+
+\begin{figure}[htp]
+\begin{center}
+<<plotTrSeas, eval=TRUE, echo=FALSE, fig=TRUE, height=6>>=
+## set the margins & text size
+par(mar=c(4,4,1,1), oma=c(0,0,0,0), cex=1)
+## plot the ts
+plot(cbind(co2,co2.trend,co2.seas,co2.err), main="", yax.flip=TRUE)
+@
+\end{center}
+\caption{Time series of the observed atmospheric CO$_2$ concentration at Mauna Loa, Hawai'i (top) along with the estimated trend, seasonal effects, and random errors.}
+\label{fig:LW1.figALL}
+\end{figure}
+
+%--------------------------------------------------------
+\subsection{Using \texttt{decompose} for decomposition}
+%--------------------------------------------------------
+
+Now that we have seen how to estimate and plot the various components of a classical decomposition model in a piecewise manner, let's see how to do this in one step in \texttt{R} with the function \texttt{decompose}, which accepts a \texttt{ts} object as input and returns an object of class \texttt{decomposed.ts}.
+
+<<decompCO2, eval=TRUE, echo=TRUE>>=
+## decomposition of CO2 data
+co2.decomp <- decompose(co2)
+@
+
+\noindent \texttt{co2.decomp} is a list with the following elements, which should be familiar by now:
+
+\begin{description}
+  \item[   \texttt{x} ] the observed time series $\{x_t\}$
+  \item[   \texttt{seasonal} ] time series of estimated seasonal component $\{\hat{s}_t\}$
+  \item[   \texttt{figure} ] mean seasonal effect (\texttt{length(figure) == frequency(x)})
+  \item[   \texttt{trend} ] time series of estimated trend $\{\hat{m}_t\}$
+  \item[   \texttt{random} ] time series of random errors $\{\hat{e}_t\}$
+  \item[   \texttt{type} ] type of error (\verb@"additive"@ or \verb@"multiplicative"@)
+\end{description}
+
+We can easily make plots of the output and compare them to those in Figure \ref{fig:LW1.figALL}:
+
+<<plotDecompA, eval=FALSE, echo=TRUE>>=
+## plot the obs ts, trend & seasonal effect
+plot(co2.decomp, yax.flip=TRUE)
+@
+
+\begin{figure}[htp]
+\begin{center}
+<<plotDecompB, eval=TRUE, echo=FALSE, fig=TRUE, height=6>>=
+## set the margins & text size
+par(mar=c(4,4,1,1), oma=c(0,0,0,0), cex=1)
+## plot the ts
+plot(co2.decomp, yax.flip=TRUE)
+@
+\end{center}
+\caption{Time series of the observed atmospheric CO$_2$ concentration at Mauna Loa, Hawai'i (top) along with the estimated trend, seasonal effects, and random errors obtained with the function \texttt{decompose}.}
+\label{fig:LW1.figDecomp}
+\end{figure}
+
+\noindent The results obtained with \texttt{decompose} (Figure \ref{fig:LW1.figDecomp}) are identical to those we estimated previously.
+
+Another nice feature of the \texttt{decompose} function is that it can be used for decomposition models with multiplicative (\emph{i.e.}, non-additive) errors (\emph{e.g.}, if the original time series had a seasonal amplitude that increased with time).  To do, so pass in the argument \verb@type="multiplicative"@, which is set to \verb@type="additive"@ by default.
+
+%===========================================================
+\section{Differencing to remove a trend or seasonal effects}
+%===========================================================
+
+An alternative to decomposition for removing trends is differencing.  We saw in lecture how the difference operator works and how it can be used to remove linear and nonlinear trends as well as various seasonal features that might be evident in the data.  As a reminder, we define the difference operator as
+
+\begin{equation}\label{eqn:diffDefnA}
+\nabla x_t = x_t - x_{t-1},
+\end{equation}
+
+\noindent and, more generally, for order $d$
+
+\begin{equation}\label{eqn:diffDefnB}
+\nabla^d x_t = (1-\textbf{B})^d x_t,
+\end{equation}
+
+\noindent where \textbf{B} is the backshift operator (\emph{i.e.}, $\textbf{B}^k x_t = x_{t-k}$ for $k \geq 1$).
+
+So, for example, a random walk is one of the most simple and widely used time series models, but it is not stationary.  We can write a random walk model as
+
+\begin{equation}\label{eqn:defnRW}
+  x_t = x_{t-1} + w_t, \text{ with } w_t \sim \text{N}(0,q).
+\end{equation}
+
+\noindent Applying the difference operator to Equation \eqref{eqn:defnRW} will yield a time series of Gaussian white noise errors $\{w_t\}$:
+
+\begin{equation}\label{eqn:diffRW}
+  \begin{aligned}
+    \nabla (x_t &= x_{t-1} + w_t) \\
+    x_t - x_{t-1} &= x_{t-1} - x_{t-1} + w_t \\
+    x_t - x_{t-1} &= w_t
+  \end{aligned}
+\end{equation}
+
+%----------------------------------------------
+\subsection{Using the \texttt{diff} function}
+%----------------------------------------------
+
+In \texttt{R} we can use the \texttt{diff} function for differencing a time series, which requires 3 arguments: \texttt{x} (the data), \texttt{lag} (the lag at which to difference), and \texttt{differences} (the order of differencing; $d$ in Equation \eqref{eqn:diffDefnB}).  For example, first-differencing a time series will remove a linear trend (\emph{i.e.}, \texttt{differences=1}); twice-differencing will remove a quadratic trend (\emph{i.e.}, \texttt{differences=2}).  In addition, first-differencing a time series at a lag equal to the period will remove a seasonal trend (\emph{e.g.}, set \texttt{lag=12} for monthly data).
+
+Let's use \texttt{diff} to remove the trend and seasonal signal from the CO$_2$ time series, beginning with the trend.  Close inspection of Figure \ref{fig:LW1.CO2data} would suggest that there is a nonlinear increase in CO$_2$ concentration over time, so we'll set \texttt{differences=2}):
+  
+<<plotCO2diff2Echo, eval=FALSE, echo=TRUE>>=
+## twice-difference the CO2 data
+co2.D2 <- diff(co2, differences=2)
+## plot the differenced data
+plot(co2.D2, ylab=expression(paste(nabla^2,"CO"[2])))
+@
+
+<<plotCO2diff2eval, eval=TRUE, echo=FALSE>>=
+## twice-difference the CO2 data
+co2.D2 <- diff(co2, differences=2)
+@
+  
+\begin{figure}[htp]
+\begin{center}
+<<plotCO2diff2, eval=TRUE, echo=FALSE, fig=TRUE, height=3>>=
+## set the margins & text size
+par(mar=c(4,4.5,1,1), oma=c(0,0,0,0), cex=1)
+## plot the differenced data
+plot(co2.D2, ylab=expression(paste(nabla^2,"CO"[2])))
+@
+\end{center}
+\caption{Time series of the twice-differenced atmospheric CO$_2$ concentration at Mauna Loa, Hawai'i.}
+\label{fig:LW1.figCO2diff2}
+\end{figure}
+
+We were apparently successful in removing the trend, but the seasonal effect still appears obvious (Figure \ref{fig:LW1.figCO2diff2}).  Therefore, let's go ahead and difference that series at lag-12 because our data were collected monthly.
+
+<<plotCO2diff12Echo, eval=FALSE, echo=TRUE>>=
+## difference the differenced CO2 data
+co2.D2D12 <- diff(co2.D2, lag=12)
+## plot the newly differenced data
+plot(co2.D2D12,
+     ylab=expression(paste(nabla,"(",nabla^2,"CO"[2],")")))
+@
+
+<<plotCO2diff12eval, eval=TRUE, echo=FALSE>>=
+## difference the differenced CO2 data
+co2.D2D12 <- diff(co2.D2, lag=12)
+@
+  
+\begin{figure}[htp]
+\begin{center}
+<<plotCO2diff12, eval=TRUE, echo=FALSE, fig=TRUE, height=3>>=
+## set the margins & text size
+par(mar=c(4,4.5,1,1), oma=c(0,0,0,0), cex=1)
+## plot the newly differenced data
+plot(co2.D2D12, ylab=expression(paste(nabla,"(",nabla^2,"CO"[2],")")))
+@
+\end{center}
+\caption{Time series of the lag-12 difference of the twice-differenced atmospheric CO$_2$ concentration at Mauna Loa, Hawai'i.}
+\label{fig:LW1.figCO2diff12}
+\end{figure}
+
+\noindent Now we have a time series that appears to be random errors without any obvious trend or seasonal components (Figure \ref{fig:LW1.figCO2diff12}).
+
+%=================================================
+\section{Correlation within and among time series}
+%=================================================
+  
+The concepts of covariance and correlation are very important in time series analysis.  In particular, we can examine the correlation structure of the original data or random errors from a decomposition model to help us identify possible form(s) of (non)stationary model(s) for the stochastic process.
+
+%------------------------------------------
+\subsection{Autocorrelation function (ACF)}
+%------------------------------------------
+
+Autocorrelation is the correlation of a variable with itself at differing time lags. Recall from lecture that we defined the sample autocovariance function (ACVF), $c_k$, for some lag $k$ as
+
+\begin{equation}\label{eqn:ACVF}
+c_k = \frac{1}{n}\sum_{t=1}^{n-k} \left(x_t-\bar{x}\right) \left(x_{t+k}-\bar{x}\right)
+\end{equation}
+
+\noindent Note that the sample autocovariance of $\{x_t\}$ at lag 0, $c_0$, equals the sample variance of $\{x_t\}$ calculated with a denominator of $n$.  The sample autocorrelation function (ACF) is defined as
+
+\begin{equation}\label{eqn:ACF}
+r_k = \frac{c_k}{c_0} = \text{Cor}(x_t,x_{t+k})
+\end{equation}
+
+Recall also that an approximate 95\% confidence interval on the ACF can be estimated by
+
+\begin{equation}\label{eqn:ACF95CI}
+-\frac{1}{n} \pm \frac{2}{\sqrt{n}}
+\end{equation}
+
+\noindent where $n$ is the number of data points used in the calculation of the ACF.
+
+It is important to remember two things here.  First, although the confidence interval is commonly plotted and interpreted as a horizontal line over all time lags, the interval itself actually grows as the lag increases because the number of data points $n$ used to estimate the correlation decreases by 1 for every integer increase in lag.  Second, care must be exercised when interpreting the ``significance'' of the correlation at various lags because we should expect, \emph{a priori}, that approximately 1 out of every 20 correlations will be significant based on chance alone.
+
+We can use the \texttt{acf} function in \texttt{R} to compute the sample ACF (note that adding the option \verb@type="covariance"@ will return the sample auto-covariance (ACVF) instead of the ACF--type \verb@?acf@ for details).  Calling the function by itself will will automatically produce a correlogram (\emph{i.e.}, a plot of the autocorrelation versus time lag).  The argument \texttt{lag.max} allows you to set the number of positive and negative lags.  Let's try it for the CO$_2$ data.
+
+<<plotACFa, eval=FALSE, echo=TRUE>>=
+## correlogram of the CO2 data
+acf(co2, lag.max=36)
+@
+
+\begin{figure}[htp]
+\begin{center}
+<<plotACFb, eval=TRUE, echo=FALSE, fig=TRUE, height=3>>=
+## set the margins & text size
+par(mar=c(4,4,1,1), oma=c(0,0,0,0), cex=1)
+## correlogram of the CO2 data
+acf(co2, lag.max=36)
+@
+\end{center}
+\caption{Correlogram of the observed atmospheric CO$_2$ concentration at Mauna Loa, Hawai'i obtained with the function \texttt{acf}.}
+\label{fig:LW1.figACF}
+\end{figure}
+
+\noindent There are 4 things about Figure \ref{fig:LW1.figACF} that are noteworthy:
+
+\begin{enumerate}
+\item the ACF at lag 0, $r_0$, equals 1 by default (\emph{i.e.}, the correlation of a time series with itself)--it's plotted as a reference point;
+\item the $x$-axis has decimal values for lags, which is caused by \texttt{R} using the year index as the lag rather than the month;
+\item the horizontal blue lines are the approximate 95\% CI's; and
+\item there is very high autocorrelation even out to lags of 36 months.
+\end{enumerate}                                                                                                              
+                                                                                                              As an alternative to the plotting utility in \texttt{acf}, let's define a new plot function for \texttt{acf} objects with some better features:
+
+<<BetterPlotACF, eval=TRUE, echo=TRUE>>=                                                                                                    ## better ACF plot
+plot.acf <- function(ACFobj) {
+  rr <- ACFobj$acf[-1]
+  kk <- length(rr)
+  nn <- ACFobj$n.used
+  plot(seq(kk),rr,type="h",lwd=2,yaxs="i",xaxs="i",
+       ylim=c(floor(min(rr)),1),xlim=c(0,kk+1),
+       xlab="Lag",ylab="Correlation",las=1)
+  abline(h=-1/nn+c(-2,2)/sqrt(nn),lty="dashed",col="blue")
+  abline(h=0)
+}                                                                                                            
+@
+
+Now we can assign the result of \texttt{acf} to a variable and then use the information contained therein to plot the correlogram with our new plot function.
+
+<<betterACF, eval=FALSE, echo=TRUE>>=
+## acf of the CO2 data
+co2.acf <- acf(co2, lag.max=36)
+## correlogram of the CO2 data
+plot.acf(co2.acf)
+@
+
+<<DoOurACF, eval=TRUE, echo=FALSE>>=
+## acf of the CO2 data
+co2.acf <- acf(co2, lag.max=36)
+@
+
+\begin{figure}[htp]
+\begin{center}
+<<plotbetterACF, eval=TRUE, echo=FALSE, fig=TRUE, height=3>>=
+## set the margins & text size
+par(mar=c(4,4,1,1), oma=c(0,0,0,0), cex=1)
+## correlogram of the CO2 data
+plot.acf(co2.acf)
+@
+\end{center}
+\caption{Correlogram of the observed atmospheric CO$_2$ concentration at Mauna Loa, Hawai'i obtained with the function \texttt{plot.acf}.}
+         \label{fig:LW1.figOwnACF}
+         \end{figure}
+
+\noindent Notice that all of the relevant information is still there (Figure \ref{fig:LW1.figOwnACF}), but now $r_0=1$ is not plotted at lag-0 and the lags on the $x$-axis are displayed correctly as integers.
+
+Before we move on to the PACF, let's look at the ACF for some deterministic time series, which will help you identify interesting properties (\emph{e.g.}, trends, seasonal effects) in a stochastic time series, and account for them in time series models--an important topic in this course.  First, let's look at a straight line.
+
+<<LinearACFecho, eval=FALSE, echo=TRUE>>=
+## length of ts
+nn <- 100
+## create straight line
+tt <- seq(nn)
+## set up plot area
+par(mfrow=c(1,2))
+## plot line
+plot.ts(tt, ylab=expression(italic(x[t])))
+## get ACF
+line.acf <- acf(tt, plot=FALSE)
+## plot ACF
+plot.acf(line.acf)
+@
+
+<<LinearACF, eval=TRUE, echo=FALSE>>=
+## length of ts
+nn <- 100
+## create straight line
+tt <- seq(nn)
+## get ACF
+line.acf <- acf(tt)
+@
+  
+\begin{figure}[htp]
+\begin{center}
+<<plotLinearACF, eval=TRUE, echo=FALSE, fig=TRUE, height=3>>=
+## set the margins & text size
+par(mfrow=c(1,2), mar=c(4,4,1,1), oma=c(0,0,0,0), cex=1)
+## plot line
+plot.ts(tt, ylab=expression(italic(x[t])))
+## plot ACF
+plot.acf(line.acf)
+@
+\end{center}
+\caption{Time series plot of a straight line (left) and the correlogram of its ACF (right).}
+\label{fig:LW1.figLinearACF}
+\end{figure}
+
+\noindent The correlogram for a straight line is itself a linearly decreasing function over time (Figure \ref{fig:LW1.figLinearACF}).
+
+Now let's examine the ACF for a sine wave and see what sort of pattern arises.
+
+<<SineACFecho, eval=FALSE, echo=TRUE>>=
+## create sine wave
+tt <- sin(2*pi*seq(nn)/12)
+## set up plot area
+par(mfrow=c(1,2))
+## plot line
+plot.ts(tt, ylab=expression(italic(x[t])))
+## get ACF
+sine.acf <- acf(tt, plot=FALSE)
+## plot ACF
+plot.acf(sine.acf)
+@
+
+<<SineACF, eval=TRUE, echo=FALSE>>=
+## create sine wave
+tt <- sin(2*pi*seq(nn)/12)
+## get ACF
+sine.acf <- acf(tt, plot=FALSE)
+@
+  
+\begin{figure}[htp]
+\begin{center}
+<<plotSineACF, eval=TRUE, echo=FALSE, fig=TRUE, height=3>>=
+## set the margins & text size
+par(mfrow=c(1,2), mar=c(4,4,1,1), oma=c(0,0,0,0), cex=1)
+## plot line
+plot.ts(tt, ylab=expression(italic(x[t])))
+## plot ACF
+plot.acf(sine.acf)
+@
+\end{center}
+\caption{Time series plot of a discrete sine wave (left) and the correlogram of its ACF (right).}
+\label{fig:LW1.figSineACF}
+\end{figure}
+
+\noindent Perhaps not surprisingly, the correlogram for a sine wave is itself a sine wave whose amplitude decreases linearly over time (Figure \ref{fig:LW1.figSineACF}).
+
+Now let's examine the ACF for a sine wave with a linear downward trend and see what sort of patterns arise.
+
+<<SiLineACFecho, eval=FALSE, echo=TRUE>>=
+## create sine wave with trend
+tt <- sin(2*pi*seq(nn)/12) - seq(nn)/50
+## set up plot area
+par(mfrow=c(1,2))
+## plot line
+plot.ts(tt, ylab=expression(italic(x[t])))
+## get ACF
+sili.acf <- acf(tt, plot=FALSE)
+## plot ACF
+plot.acf(sili.acf)
+@
+
+<<SiLiACF, eval=TRUE, echo=FALSE>>=
+## create sine wave with trend
+tt <- sin(2*pi*seq(nn)/12) - seq(nn)/50
+## get ACF
+sili.acf <- acf(tt, plot=FALSE)
+@
+  
+\begin{figure}[htp]
+\begin{center}
+<<plotSiLiACF, eval=TRUE, echo=FALSE, fig=TRUE, height=3>>=
+## set the margins & text size
+par(mfrow=c(1,2), mar=c(4,4,1,1), oma=c(0,0,0,0), cex=1)
+## plot line
+plot.ts(tt, ylab=expression(italic(x[t])))
+## plot ACF
+plot.acf(sili.acf)
+@
+\end{center}
+\caption{Time series plot of a discrete sine wave (left) and the correlogram of its ACF (right).}
+\label{fig:LW1.figSiLiACF}
+\end{figure}
+
+\noindent The correlogram for a sine wave with a trend is itself a nonsymmetrical sine wave whose amplitude and center decrease over time (Figure \ref{fig:LW1.figSiLiACF}).
+
+As we have seen, the ACF is a powerful tool in time series analysis for identifying important features in the data.  As we will see later, the ACF is also an important diagnostic tool for helping to select the proper order of $p$ and $q$ in ARMA($p$,$q$) models.
+
+%---------------------------------------------------
+\subsection{Partial autocorrelation function (PACF)}
+%---------------------------------------------------
+
+The partial autocorrelation function (PACF) measures the linear correlation of a series $\{x_t\}$ and a lagged version of itself $\{x_{t+k}\}$ with the linear dependence of $\{x_{t-1},x_{t-2},\dots,x_{t-(k-1)}\}$ removed.  Recall from lecture that we define the PACF as
+
+\begin{equation}\label{eqn:PACFdefn}
+f_k = \begin{cases}
+        \text{Cor}(x_1,x_0)=r_1 & \text{if } k = 1;\\
+        \text{Cor}(x_k-x_k^{k-1},x_0-x_0^{k-1}) & \text{if } k \geq 2;
+      \end{cases}
+\end{equation}
+
+with
+
+\begin{subequations}\label{eqn:PACFdefnP2}
+  \begin{align}
+    x_k^{k-1} &= \beta_1x_{k-1} + \beta_2x_{k-2} + \dots + \beta_{k-1}x_1; \\
+    x_0^{k-1} &= \beta_1x_1 + \beta_2x_2 + \dots + \beta_{k-1}x_{k-1}.
+  \end{align}
+\end{subequations}
+
+It's easy to compute the PACF for a variable in \texttt{R} using the \texttt{pacf} function, which will automatically plot a correlogram when called by itself (similar to \texttt{acf}).  Let's look at the PACF for the CO$_2$ data.
+
+<<plotPACFa, eval=FALSE, echo=TRUE>>=
+## PACF of the CO2 data
+pacf(co2, lag.max=36)
+@
+
+The default plot for PACF is a bit better than for ACF, but here is another plotting function that might be useful.
+
+<<BetterPlotPACF, eval=TRUE, echo=TRUE>>=                                                                                                   # ## better PACF plot
+plot.pacf <- function(PACFobj) {
+  rr <- PACFobj$acf
+  kk <- length(rr)
+  nn <- PACFobj$n.used
+  plot(seq(kk),rr,type="h",lwd=2,yaxs="i",xaxs="i",
+       ylim=c(floor(min(rr)),1),xlim=c(0,kk+1),
+       xlab="Lag",ylab="PACF",las=1)
+  abline(h=-1/nn+c(-2,2)/sqrt(nn),lty="dashed",col="blue")
+  abline(h=0)
+}                                                                                                            
+@
+
+\begin{figure}[htp]
+\begin{center}
+<<plotPACFb, eval=TRUE, echo=FALSE, fig=TRUE, height=3>>=
+## set the margins & text size
+par(mar=c(4,4,1,1), oma=c(0,0,0,0), cex=1)
+## correlogram of the CO2 data
+pacf(co2, lag.max=36)
+@
+\end{center}
+\caption{Correlogram of the PACF for the observed atmospheric CO$_2$ concentration at Mauna Loa, Hawai'i obtained with the function \texttt{pacf}.}
+\label{fig:LW1.figPACF}
+\end{figure}
+
+\noindent Notice in Figure \ref{fig:LW1.figPACF} that the partial autocorrelation at lag-1 is very high (it equals the ACF at lag-1), but the other values at lags > 1 are relatively small, unlike what we saw for the ACF.  We will discuss this in more detail later on in this lab.
+
+Notice also that the PACF plot again has real-valued indices for the time lag, but it does not include any value for lag-0 because it is impossible to remove any intermediate autocorrelation between $t$ and $t-k$ when $k=0$, and therefore the PACF does not exist at lag-0.  If you would like, you can use the \texttt{plot.acf} function we defined above to plot the PACF estimates because \texttt{acf} and \texttt{pacf} produce identical list structures (results not shown here).
+
+<<CO2PACFecho, eval=FALSE, echo=TRUE>>=
+## PACF of the CO2 data
+co2.pacf <- pacf(co2)
+## correlogram of the CO2 data
+plot.acf(co2.pacf)
+@
+
+As with the ACF, we will see later on how the PACF can also be used to help identify the appropriate order of $p$ and $q$ in ARMA($p$,$q$) models.
+
+%--------------------------------------------
+\subsection{Cross-correlation function (CCF)}
+%--------------------------------------------
+
+Often we are interested in looking for relationships between 2 different time series.  There are many ways to do this, but a simple method is via examination of their cross-covariance and cross-correlation.
+
+We begin by defining the sample cross-covariance function (CCVF) in a manner similar to the ACVF, in that
+
+\begin{equation}\label{eqn:CCVF}
+g_k^{xy} = \frac{1}{n}\sum_{t=1}^{n-k} \left(y_t-\bar{y}\right) \left(x_{t+k}-\bar{x}\right),
+\end{equation}
+
+\noindent but now we are estimating the correlation between a variable $y$ and a \emph{different} time-shifted variable $x_{t+k}$.  The sample cross-correlation function (CCF) is then defined analogously to the ACF, such that
+
+\begin{equation}\label{eqn:CCF}
+r_k^{xy} = \frac{g_k^{xy}}{\sqrt{\text{SD}_x\text{SD}_y}};
+\end{equation}
+
+\noindent SD$_x$ and SD$_y$ are the sample standard deviations of $\{x_t\}$ and $\{y_t\}$, respectively. It is important to re-iterate here that $r_k^{xy} \neq r_{-k}^{xy}$, but $r_k^{xy} = r_{-k}^{yx}$.  Therefore, it is very important to pay particular attention to which variable you call $y$ (\emph{i.e.}, the ``response'') and which you call $x$ (\emph{i.e.}, the ``predictor'').
+
+As with the ACF, an approximate 95\% confidence interval on the CCF can be estimated by
+
+\begin{equation}\label{eqn:CCF95CI}
+-\frac{1}{n} \pm \frac{2}{\sqrt{n}}
+\end{equation}
+
+\noindent where $n$ is the number of data points used in the calculation of the CCF, and the same assumptions apply to its interpretation.
+
+Computing the CCF in \texttt{R} is easy with the function \texttt{ccf} and it works just like \texttt{acf}.  In fact, \texttt{ccf} is just a ``wrapper'' function that calls \texttt{acf}.  As an example, let's examine the CCF between sunspot activity and number of lynx trapped in Canada as in the classic paper by Moran\footnote{Moran, P.A.P. 1949. The statistical analysis of the sunspot and lynx cycles. \emph{J. Anim. Ecol.} 18:115-116}.
+
+To begin, let's get the data, which are conveniently included in the \texttt{datasets} package included as part of the base installation of \texttt{R}.  Before calculating the CCF, however, we need to find the matching years of data.  Again, we'll use the \texttt{ts.intersect} function.
+
+<<LynxSunspotCCF, eval=TRUE, echo=TRUE>>=
+## get the matching years of sunspot data
+suns <- ts.intersect(lynx,sunspot.year)[,"sunspot.year"]
+## get the matching lynx data
+lynx <- ts.intersect(lynx,sunspot.year)[,"lynx"]
+@
+
+Here are plots of the time series.
+
+<<plotSunsLynxEcho, eval=FALSE, echo=TRUE>>=
+## plot time series
+plot(cbind(suns,lynx), yax.flip=TRUE)
+@
+
+\begin{figure}[htp]
+\begin{center}
+<<plotSunsLynx, eval=TRUE, echo=FALSE, fig=TRUE, height=6>>=
+## set the margins & text size
+par(mar=c(4,4,1,1), oma=c(0,0,0,0), cex=1)
+## plot the ts
+plot(cbind(suns,lynx), main="", yax.flip=TRUE)
+@
+\end{center}
+\caption{Time series of sunspot activity (top) and lynx trappings in Canada (bottom) from 1821-1934.}
+\label{fig:LW1.SunsLynx}
+\end{figure}
+
+
+It is important to remember which of the 2 variables you call $y$ and $x$ when calling \texttt{ccf(x, y, ...)}.  In this case, it seems most relevant to treat lynx as the $y$ and sunspots as the $x$, in which case we are mostly interested in the CCF at negative lags (\emph{i.e.}, when sunspot activity predates inferred lynx abundance).  Furthermore, we'll use log-transformed lynx trappings.
+
+<<plotCCFa, eval=FALSE, echo=TRUE>>=
+## CCF of sunspots and lynx
+ccf(suns, log(lynx), ylab="Cross-correlation")
+@
+
+\begin{figure}[htp]
+\begin{center}
+<<plotCCFb, eval=TRUE, echo=FALSE, fig=TRUE, height=3>>=
+## set the margins & text size
+par(mar=c(4,4,1,1), oma=c(0,0,0,0), cex=1)
+## CCF of sunspots and lynx
+ccf(suns, lynx, ylab="Cross-correlation")
+@
+\end{center}
+\caption{CCF for annual sunspot activity and the log of the number of lynx trappings in Canada from 1821-1934.}
+\label{fig:LW1.figCCFLynxSun}
+\end{figure}
+
+From Figures \ref{fig:LW1.SunsLynx} and \ref{fig:LW1.figCCFLynxSun} it looks like lynx numbers are relatively low 3-5 years after high sunspot activity (\emph{i.e.}, significant correlation at lags of -3 to -5).
+
+
+%=========================
+\section{White noise (WN)}
+%=========================
+
+A time series $\{w_t\}$ is a discrete white noise series (DWN) if the $w_1, w_1, \dots, w_t$ are independent and identically distributed (IID) with a mean of zero. For most of the examples in this course we will assume that the $w_t \sim \text{N}(0,q)$, and therefore we refer to the time series $\{w_t\}$ as Gaussian white noise.  If our time series model has done an adequate job of removing all of the serial autocorrelation in the time series with trends, seasonal effects, etc., then the model residuals ($e_t = y_t - \hat{y}_t$) will be a WN sequence with the following properties for its mean ($\bar{e}$), covariance ($c_k$), and autocorrelation ($r_k$):
+
+\begin{equation}\label{eqn:WNprops}
+  \begin{aligned}
+    \bar{x} &= 0 \\
+    c_k &= \text{Cov}(e_t,e_{t+k}) = \begin{cases}
+            q & \text{if } k = 0 \\
+            0 & \text{if } k \neq 1
+          \end{cases} \\
+    r_k &= \text{Cor}(e_t,e_{t+k}) = \begin{cases}
+            1 & \text{if } k = 0 \\
+            0 & \text{if } k \neq 1.
+          \end{cases}
+  \end{aligned}
+\end{equation}
+
+%----------------------------------
+\subsection{Simulating white noise}
+%----------------------------------
+
+Simulating WN in \texttt{R} is straightforward with a variety of built-in random number generators for continuous and discrete distributions.  Once you know \texttt{R}'s abbreviation for the distribution of interest, you add an \texttt{r} to the beginning to get the function's name.  For example, a Gaussian (or normal) distribution is abbreviated \texttt{norm} and so the function is \texttt{rnorm}.  All of the random number functions require two things: the number of samples from the distribution (\texttt{n}), and the parameters for the distribution itself (\emph{e.g.}, mean \& SD of a normal).  Check the help file for the distribution of interest to find out what parameters you must specify (\emph{e.g.}, type \texttt{?rnorm} to see the help for a normal distribution).
+
+Here's how to generate 100 samples from a normal distribution with mean of 5 and standard deviation of 0.2, and 50 samples from a Poisson distribution with a rate ($\lambda$) of 20.
+
+<<DWNsim, echo=TRUE, eval=TRUE>>=
+set.seed(123)
+## random normal variates
+GWN <- rnorm(n=100, mean=5, sd=0.2)
+## random Poisson variates
+PWN <- rpois(n=50, lambda=20)
+@
+
+Here are plots of the time series.  Notice that on one occasion the same number was drawn twice in a row from the Poisson distribution, which is discrete.  That is virtually guaranteed to never happen with a continuous distribution.
+
+<<DWNsimPlotEcho, echo=TRUE, eval=FALSE>>=
+## set up plot region
+par(mfrow=c(1,2))
+## plot normal variates with mean
+plot.ts(GWN)
+abline(h=5, col="blue", lty="dashed")
+## plot Poisson variates with mean
+plot.ts(PWN)
+abline(h=20, col="blue", lty="dashed")
+@
+
+\begin{figure}[htp]
+\begin{center}
+<<plotDWNsims, eval=TRUE, echo=FALSE, fig=TRUE, height=3>>=
+## set the margins & text size
+par(mar=c(4,4,1,1), oma=c(0,0,0,0), cex=1, mfrow=c(1,2))
+## plot normal variates with mean
+plot.ts(GWN)
+abline(h=5, col="blue", lty="dashed")
+## plot Poisson variates with mean
+plot.ts(PWN)
+abline(h=20, col="blue", lty="dashed")
+@
+  \end{center}
+\caption{Time series plots of simulated Gaussian (left) and Poisson (right) white noise.}
+\label{fig:LW1.WNexTS}
+\end{figure}
+
+Now let's examine the ACF for the 2 white noise series and see if there is, in fact, zero autocorrelation for lags $\geq$ 1.
+
+<<DWNacfEcho, echo=TRUE, eval=FALSE>>=
+## set up plot region
+par(mfrow=c(1,2))
+## plot normal variates with mean
+acf(GWN, main="", lag.max=20)
+## plot Poisson variates with mean
+acf(PWN, main="", lag.max=20)
+@
+
+\begin{figure}[htp]
+\begin{center}
+<<plotACFdwn, eval=TRUE, echo=FALSE, fig=TRUE, height=3>>=
+## set the margins & text size
+par(mar=c(4,4,1,1), oma=c(0,0,0,0), cex=1, mfrow=c(1,2))
+## plot normal variates with mean
+acf(GWN, main="", lag.max=20)
+## plot Poisson variates with mean
+acf(PWN, main="", lag.max=20)
+@
+\end{center}
+\caption{ACF's for the simulated Gaussian (left) and Poisson (right) white noise shown in Figure \ref{fig:LW1.WNexTS}.}
+\label{fig:LW1.WNexACF}
+\end{figure}
+
+Interestingly, the $r_k$ are all greater than zero in absolute value although they are not statistically different from zero for lags 1-20.  This is because we are dealing with a \emph{sample} of the distributions rather than the entire population of all random variates.  As an exercise, try setting \texttt{n=1e6} instead of \texttt{n=100} or \texttt{n=50} in the calls calls above to generate the WN sequences and see what effect it has on the estimation of $r_k$.  It is also important to remember, as we discussed earlier, that we should expect that approximately 1 in 20 of the $r_k$ will be statistically greater than zero based on chance alone, especially for relatively small sample sizes, so don't get too excited if you ever come across a case like then when inspecting model residuals.
+
+
+%==========================
+\section{Random walks (RW)}
+%==========================
+
+Random walks receive considerable attention in time series analyses because of their ability to fit a wide range of data despite their surprising simplicity.  In fact, random walks are the most simple non-stationary time series model.  A random walk is a time series $\{x_t\}$ where
+
+\begin{equation}\label{eqn:defnRW2}
+  x_t = x_{t-1} + w_t,
+\end{equation}
+
+\noindent and $w_t$ is a discrete white noise series where all values are independent and identically distributed (IID) with a mean of zero. In practice, we will almost always assume that the $w_t$ are Gaussian white noise, such that $w_t \sim \text{N}(0,q)$.  We will see later that a random walk is a special case of an autoregressive model.
+
+%------------------------------------
+\subsection{Simulating a random walk}
+%------------------------------------
+
+Simulating a RW model in \texttt{R} is straightforward with a \texttt{for} loop and the use of \texttt{rnorm} to generate Gaussian errors (type \verb@?rnorm@ to see details on the function and its useful relatives \texttt{dnorm} and \texttt{pnorm}).  Let's create 100 obs (we'll also set the random number seed so everyone gets the same results).  
+
+<<RWsim, eval=TRUE, echo=TRUE>>=
+## set random number seed
+set.seed(123)
+## length of time series
+TT <- 100
+## initialize {x_t} and {w_t}
+xx <- ww <- rnorm(n=TT, mean=0, sd=1)
+## compute values 2 thru TT
+for(t in 2:TT) { xx[t] <- xx[t-1] + ww[t] }
+@
+
+Now let's plot the simulated time series and its ACF.
+
+<<plotRWecho, eval=FALSE, echo=TRUE>>=
+## setup plot area
+par(mfrow=c(1,2))
+## plot line
+plot.ts(xx, ylab=expression(italic(x[t])))
+## plot ACF
+plot.acf(acf(xx, plot=FALSE))
+@
+
+<<calcRWACF, eval=TRUE, echo=FALSE>>=
+xx.acf <- acf(xx, plot=FALSE)
+@
+
+\begin{figure}[htp]
+\begin{center}
+<<plotRW, eval=TRUE, echo=FALSE, fig=TRUE, height=3>>=
+## setup plot area
+par(mfrow=c(1,2), mar=c(4,4,1,1), oma=c(0,0,0,0), cex=1)
+## plot line
+plot.ts(xx, ylab=expression(italic(x[t])))
+## plot ACF
+plot.acf(xx.acf)
+@
+\end{center}
+\caption{Simulated time series of a random walk model (left) and its associated ACF (right).}
+\label{fig:LW1.figRWdataACF}
+\end{figure}
+
+\noindent Perhaps not surprisingly based on their names, autoregressive models such as RW's have a high degree of autocorrelation out to long lags (Figure \ref{fig:LW1.figRWdataACF}).
+
+%----------------------------------------------------
+\subsection{Alternative formulation of a random walk}
+%----------------------------------------------------
+
+As an aside, let's use an alternative formulation of a random walk model to see an even shorter way to simulate an RW in \texttt{R}.  Based on our definition of a random walk in Equation \eqref{eqn:defnRW2}, it is easy to see that
+
+\begin{equation}\label{eqn:defnRWalt}
+  \begin{aligned}
+  x_t &= x_{t-1} + w_t \\
+  x_{t-1} &= x_{t-2} + w_{t-1} \\
+  x_{t-2} &= x_{t-3} + w_{t-2} \\
+  &\; \; \vdots
+  \end{aligned}
+\end{equation}
+
+\noindent Therefore, if we substitute $x_{t-2} + w_{t-1}$ for $x_{t-1}$ in the first equation, and then $x_{t-3} + w_{t-2}$ for $x_{t-2}$, and so on in a recursive manner, we get
+
+\begin{equation}\label{eqn:defnRWalt2}
+  x_t = w_t + w_{t-1} + w_{t-2} + \dots + w_{t-\infty} + x_{t-\infty}.
+\end{equation}
+
+\noindent In practice, however, the time series will not start an infinite time ago, but rather at some $t=1$, in which case we can write
+
+\begin{equation}\label{eqn:defnRWalt3}
+  \begin{aligned}
+  x_t &= w_1 + w_2 + \dots + w_t \\
+      &= \sum_{t=1}^{T} w_t.
+  \end{aligned}
+\end{equation}
+
+From Equation \eqref{eqn:defnRWalt3} it is easy to see that the value of an RW process at time step $t$ is the sum of all the random errors up through time $t$.  Therefore, in \texttt{R} we can easily simulate a realization from an RW process using the \texttt{cumsum(x)} function, which does cumulative summation of the vector \texttt{x} over its entire length.  If we use the same errors as before, we should get the same results.
+
+<<RWsimAlt, eval=TRUE, echo=TRUE>>=
+## simulate RW
+x2 <- cumsum(ww)
+@
+
+\noindent Let's plot both time series to see if it worked.
+
+<<plotRWsimEcho, eval=FALSE, echo=TRUE>>=
+## setup plot area
+par(mfrow=c(1,2))
+## plot 1st RW
+plot.ts(xx, ylab=expression(italic(x[t])))
+## plot 2nd RW
+plot.ts(x2, ylab=expression(italic(x[t])))
+@
+
+\begin{figure}[htp]
+\begin{center}
+<<plotRWalt, eval=TRUE, echo=FALSE, fig=TRUE, height=3>>=
+## setup plot area
+par(mfrow=c(1,2), mar=c(4,4,1,1), oma=c(0,0,0,0), cex=1)
+## plot 1st RW
+plot.ts(xx, ylab=expression(italic(x[t])))
+## plot 2nd RW
+plot.ts(x2, ylab=expression(italic(x[t])))
+@
+\end{center}
+\caption{Time series of the same random walk model formulated as Equation \eqref{eqn:defnRW2} and simulated via a \texttt{for} loop (left), and as Equation \eqref{eqn:defnRWalt3} and simulated via \texttt{cumsum} (right).}
+\label{fig:LW1.figRWcomp}
+\end{figure}
+
+\noindent Indeed, both methods of generating a RW time series appear to be equivalent.
+
+
+%===================================
+\section{Autoregressive (AR) models}
+%===================================
+
+Autoregressive models of order $p$, abbreviated AR($p$), are commonly used in time series analyses.  In particular, AR(1) models (and their multivariate extensions) see considerable use in ecology as we will see later in the course.  Recall from lecture that an AR($p$) model is written as
+
+\begin{equation}\label{eqn:defnARp}
+  x_t = \phi_1 x_{t-1} + \phi_2 x_{t-2} + \dots + \phi_p x_{t-p} + w_t,
+\end{equation}
+
+\noindent where $\{w_t\}$ is a white noise sequence with zero mean and some variance $\sigma^2$.  For our purposes we usually assume that $w_t \sim \text{N}(0,q)$.  Note that the random walk in Equation \eqref{eqn:defnRW2} is a special case of an AR(1) model where $\phi_1=1$ and $\phi_k=0$ for $k \geq 2$.
+
+%-----------------------------------------
+\subsection{Simulating an AR($p$) process}
+%-----------------------------------------
+
+Although we could simulate an AR($p$) process in \texttt{R} using a \texttt{for} loop just as we did for a random walk, it's much easier with the function \texttt{arima.sim}, which works for all forms and subsets of ARIMA models.  To do so, remember that the AR in ARIMA stands for ``autoregressive'', the I for ``integrated'', and the MA for ``moving-average''; we specify the order of ARIMA models as $p,d,q$.  So, for example, we would specify an AR(2) model as ARIMA(2,0,0), or an MA(1) model as ARIMA(0,0,1).  If we had an ARMA(3,1) model that we applied to data that had been twice-differenced, then we would have an ARIMA(3,2,1) model. 
+
+\texttt{arima.sim} will accept many arguments, but we are interested primarily in two of them: \texttt{n} and \texttt{model} (type \verb@?arima.sim@ to learn more).  The former simply indicates the length of desired time series, but the latter is more complex.  Specifically, \texttt{model} is a list with the following elements:
+
+\begin{description}
+  \item[\texttt{   order }] a vector of length 3 containing the ARIMA($p,d,q$) order
+  \item[\texttt{   ar }] a vector of length $p$ containing the AR($p$) coefficients
+  \item[\texttt{   ma }] a vector of length $q$ containing the MA($q$) coefficients
+  \item[\texttt{   sd }] a scalar indicating the std dev of the Gaussian errors
+\end{description}
+
+\noindent Note that you can omit the \texttt{ma} element entirely if you have an AR($p$) model, or omit the \texttt{ar} element if you have an MA($q$) model.  If you omit the \texttt{sd} element, \texttt{arima.sim} will assume you want normally distributed errors with SD = 1.  Also note that you can pass \texttt{arima.sim} your own time series of random errors or the name of a function that will generate the errors (\emph{e.g.}, you could use \texttt{rpois} if you wanted a model with Poisson errors).  Type \verb@?arima.sim@ for more details. 
+
+Let's begin by simulating some AR(1) models and comparing their behavior.  First, let's choose models with contrasting AR coefficients.  Recall that in order for an AR(1) model to be stationary, $\phi < \lvert 1 \rvert$, so we'll try 0.1 and 0.9.  We'll again set the random number seed so we will get the same answers. 
+
+<<simAR1, echo=TRUE, eval=TRUE>>=
+set.seed(456)
+## list description for AR(1) model with small coef
+AR.sm <- list(order=c(1,0,0), ar=0.1, sd=0.1)
+## list description for AR(1) model with large coef
+AR.lg <- list(order=c(1,0,0), ar=0.9, sd=0.1)
+## simulate AR(1)
+AR1.sm <- arima.sim(n=50, model=AR.sm)
+AR1.lg <- arima.sim(n=50, model=AR.lg)
+@
+
+\noindent Now let's plot the 2 simulated series.
+
+<<plotAR1sims, eval=FALSE, echo=TRUE>>=
+## setup plot region
+par(mfrow=c(1,2))
+## get y-limits for common plots
+ylm <- c(min(AR1.sm,AR1.lg), max(AR1.sm,AR1.lg))
+## plot the ts
+plot.ts(AR1.sm, ylim=ylm,
+        ylab=expression(italic(x)[italic(t)]),
+        main=expression(paste(phi," = 0.1")))
+plot.ts(AR1.lg, ylim=ylm,
+        ylab=expression(italic(x)[italic(t)]),
+        main=expression(paste(phi," = 0.9")))
+@
+
+<<getPlotLims, eval=TRUE, echo=FALSE>>=
+## get y-limits for common plots
+ylm <- c(min(AR1.sm,AR1.lg), max(AR1.sm,AR1.lg))
+@
+
+\begin{figure}[htp]
+\begin{center}
+<<plotAR1contrast, eval=TRUE, echo=FALSE, fig=TRUE, height=3>>=
+## set the margins & text size
+par(mfrow=c(1,2), mar=c(4,4,1.5,1), oma=c(0,0,0,0), cex=1)
+## plot the ts
+plot.ts(AR1.sm, ylim=ylm,
+        ylab=expression(italic(x)[italic(t)]),
+        main=expression(paste(phi," = 0.1")))
+plot.ts(AR1.lg, ylim=ylm,
+        ylab=expression(italic(x)[italic(t)]),
+        main=expression(paste(phi," = 0.9")))
+@
+\end{center}
+\caption{Time series of simulated AR(1) processes with $\phi=0.1$ (left) and $\phi=0.9$ (right).}
+\label{fig:LW1.AR1comp}
+\end{figure}
+
+What do you notice about the two plots in Figure \ref{fig:LW1.AR1comp}?  It looks like the time series with the smaller AR coefficient is more ``choppy'' and seems to stay closer to 0 whereas the time series with the larger AR coefficient appears to wander around more.  Remember that as the coefficient in an AR(1) model goes to 0, the model approaches a WN sequence, which is stationary in both the mean and variance.  As the coefficient goes to 1, however, the model approaches a random walk, which is not stationary in either the mean or variance.
+
+Next, let's generate two AR(1) models that have the same magnitude coeficient, but opposite signs, and compare their behavior.
+
+<<simAR1opps, echo=TRUE, eval=TRUE>>=
+set.seed(123)
+## list description for AR(1) model with small coef
+AR.pos <- list(order=c(1,0,0), ar=0.5, sd=0.1)
+## list description for AR(1) model with large coef
+AR.neg <- list(order=c(1,0,0), ar=-0.5, sd=0.1)
+## simulate AR(1)
+AR1.pos <- arima.sim(n=50, model=AR.pos)
+AR1.neg <- arima.sim(n=50, model=AR.neg)
+@
+
+\noindent OK, let's plot the 2 simulated series.
+
+<<plotAR1oppsEcho, eval=FALSE, echo=TRUE>>=
+## setup plot region
+par(mfrow=c(1,2))
+## get y-limits for common plots
+ylm <- c(min(AR1.pos,AR1.neg), max(AR1.pos,AR1.neg))
+## plot the ts
+plot.ts(AR1.pos, ylim=ylm,
+        ylab=expression(italic(x)[italic(t)]),
+        main=expression(paste(phi[1]," = 0.5")))
+plot.ts(AR1.neg,
+        ylab=expression(italic(x)[italic(t)]),
+        main=expression(paste(phi[1]," = -0.5")))
+@
+
+<<getPlotLimsOpps, eval=TRUE, echo=FALSE>>=
+## get y-limits for common plots
+ylm <- c(min(AR1.pos,AR1.neg), max(AR1.pos,AR1.neg))
+@
+
+\begin{figure}[htp]
+\begin{center}
+<<plotAR1opps, eval=TRUE, echo=FALSE, fig=TRUE, height=3>>=
+## set the margins & text size
+par(mfrow=c(1,2), mar=c(4,4,1.5,1), oma=c(0,0,0,0), cex=1)
+## plot the ts
+plot.ts(AR1.pos, ylim=ylm,
+        ylab=expression(italic(x)[italic(t)]),
+        main=expression(paste(phi[1]," = 0.5")))
+plot.ts(AR1.neg, ylim=ylm,
+        ylab=expression(italic(x)[italic(t)]),
+        main=expression(paste(phi[1]," = -0.5")))
+@
+\end{center}
+\caption{Time series of simulated AR(1) processes with $\phi_1=0.5$ (left) and $\phi_1=-0.5$ (right).}
+\label{fig:LW1.AR1comp2b}
+\end{figure}
+
+\noindent Now it appears like both time series vary around the mean by about the same amount, but the model with the negative coefficient produces a much more ``sawtooth'' time series.  It turns out that any AR(1) model with $-1<\phi<0$ will exhibit the 2-point oscillation you see here.
+
+We can simulate higher order AR($p$) models in the same manner, but care must be exercised when choosing a set of coefficients that result in a stationary model or else \texttt{arima.sim} will fail and report an error.  For example, an AR(2) model with both coefficients equal to 0.5 is not stationary, and therefore this function call will not work:
+
+<<ARpFail, eval=FALSE, echo=TRUE>>=
+arima.sim(n=100, model=list(order(2,0,0), ar=c(0.5,0.5)))
+@
+\noindent If you try, R will respond that the ``\verb@'ar' part of model is not stationary@''.
+
+%------------------------------------------------------
+\subsection{Correlation structure of AR($p$) processes}
+%------------------------------------------------------
+
+Let's review what we learned in lecture about the general behavior of the ACF and PACF for AR($p$) models.  To do so, we'll simulate four stationary AR($p$) models of increasing order $p$ and then examine their ACF's and PACF's.  Let's use a really big $n$ so as to make them ``pure'', which will provide a much better estimate of the correlation structure.
+
+<<ARpSims, eval=TRUE, echo=TRUE>>=
+set.seed(123)
+## the 4 AR coefficients
+ARp <- c(0.7, 0.2, -0.1, -0.3)
+## empty list for storing models
+AR.mods <- list()
+## loop over orders of p
+for(p in 1:4) {
+  ## assume SD=1, so not specified
+  AR.mods[[p]] <- arima.sim(n=10000, list(ar=ARp[1:p]))
+}
+@
+
+Now that we have our four AR($p$) models, lets look at plots of the time series, ACF's, and PACF's.
+
+<<plotARpCompsEcho, eval=FALSE, echo=TRUE>>=
+## set up plot region
+par(mfrow=c(4,3))
+## loop over orders of p
+for(p in 1:4) {
+  plot.ts(AR.mods[[p]][1:50],
+          ylab=paste("AR(",p,")",sep=""))
+  acf(AR.mods[[p]], lag.max=12)
+  pacf(AR.mods[[p]], lag.max=12, ylab="PACF")
+}
+@
+
+\begin{figure}[htp]
+\begin{center}
+<<plotARpComps, eval=TRUE, echo=FALSE, fig=TRUE, height=8>>=
+## set the margins & text size
+par(mfrow=c(4,3), mar=c(4,4,0.5,0.5), oma=c(0,0,0,0), cex=1)
+## loop over orders of p
+for(p in 1:4) {
+  plot.ts(AR.mods[[p]][1:50],ylab=paste("AR(",p,")",sep=""))
+  acf(AR.mods[[p]], lag.max=12)
+  pacf(AR.mods[[p]], lag.max=12, ylab="PACF")
+}
+@
+\end{center}
+\caption{Time series of simulated AR($p$) processes (left column) of increasing orders from 1-4 (rows) with their associated ACF's (center column) and PACF's (right column).  Note that only the first 50 values of $x_t$ are plotted.}
+\label{fig:LW1.ARpComps}
+\end{figure}
+
+\noindent As we saw in lecture and is evident from our examples shown in Figure \ref{fig:LW1.ARpComps}, the ACF for an AR($p$) process tails off toward zero very slowly, but the PACF goes to zero for lags > $p$.  This is an important diagnostic tool when trying to identify the order of $p$ in ARMA($p,q$) models.
+
+%===================================
+\section{Moving-average (MA) models}
+%===================================
+
+A moving-averge process of order $q$, or MA($q$), is a weighted sum of the current random error plus the $q$ most recent errors, and can be written as
+
+\begin{equation}\label{eqn:LW1.MAdefn}
+x_t = w_t + \theta_1 w_{t-1} + \theta_2 w_{t-2} + \dots + \theta_q w_{t-q},
+\end{equation}
+
+\noindent where $\{w_t\}$ is a white noise sequence with zero mean and some variance $\sigma^2$; for our purposes we usually assume that $w_t \sim \text{N}(0,q)$.  Of particular note is that because MA processes are finite sums of stationary errors, they themselves are stationary.
+
+Of interest to us are so-called ``invertible'' MA processes that can be expressed as an infinite AR process with no error term.  The term invertible comes from the inversion of the backshift operator (\textbf{B}) that we discussed in class (\emph{i.e.}, $\BB x_t= x_{t-1}$).  So, for example, an MA(1) process with $\theta < \lvert 1 \rvert$ is invertible because it can be written using the backshift operator as
+
+\begin{equation}\label{eqn:LW1.RWasB}
+\begin{aligned}
+x_t &= w_t - \theta w_{t-1} \\
+x_t &= w_t - \theta \BB w_t \\
+x_t &= (1 - \theta \BB) w_t, \\
+    &\Downarrow \\
+w_t &= \frac{1}{(1 - \theta \BB)} x_t \\
+w_t &= (1 + \theta \BB + \theta^2 \BB^2 + \theta^3 \BB^3 + \dots) x_t \\
+w_t &= x_t + \theta x_{t-1} + \theta^2 x_{t-2} + \theta^3 x_{t-3} + \dots
+\end{aligned}
+\end{equation}
+
+
+%-----------------------------------------
+\subsection{Simulating an MA($q$) process}
+%-----------------------------------------
+
+We can simulate MA($q$) processes just as we did for AR($p$) processes using \texttt{arima.sim}.  Here are 3 different ones with contrasting $\theta$'s:
+
+<<simMA1opps, echo=TRUE, eval=TRUE>>=
+set.seed(123)
+## list description for MA(1) model with small coef
+MA.sm <- list(order=c(0,0,1), ma=0.2, sd=0.1)
+## list description for MA(1) model with large coef
+MA.lg <- list(order=c(0,0,1), ma=0.8, sd=0.1)
+## list description for MA(1) model with large coef
+MA.neg <- list(order=c(0,0,1), ma=-0.5, sd=0.1)
+## simulate MA(1)
+MA1.sm <- arima.sim(n=50, model=MA.sm)
+MA1.lg <- arima.sim(n=50, model=MA.lg)
+MA1.neg <- arima.sim(n=50, model=MA.neg)
+@
+
+\noindent with their associated plots.
+
+<<plotMA1oppsEcho, eval=FALSE, echo=TRUE>>=
+## setup plot region
+par(mfrow=c(1,3))
+## plot the ts
+plot.ts(MA1.sm,
+        ylab=expression(italic(x)[italic(t)]),
+        main=expression(paste(theta," = 0.2")))
+plot.ts(MA1.lg,
+        ylab=expression(italic(x)[italic(t)]),
+        main=expression(paste(theta," = 0.8")))
+plot.ts(MA1.neg,
+        ylab=expression(italic(x)[italic(t)]),
+        main=expression(paste(theta," = -0.5")))
+@
+
+\begin{figure}[htp]
+\begin{center}
+<<plotMA1opps, eval=TRUE, echo=FALSE, fig=TRUE, height=3>>=
+## set the margins & text size
+par(mfrow=c(1,3), mar=c(4,4,1.5,0.5), oma=c(0,0,0,0), cex=1)
+## plot the ts
+plot.ts(MA1.sm,
+        ylab=expression(italic(x)[italic(t)]),
+        main=expression(paste(theta," = 0.2")))
+plot.ts(MA1.lg,
+        ylab=expression(italic(x)[italic(t)]),
+        main=expression(paste(theta," = 0.8")))
+plot.ts(MA1.neg,
+        ylab=expression(italic(x)[italic(t)]),
+        main=expression(paste(theta," = -0.5")))
+@
+\end{center}
+\caption{Time series of simulated MA(1) processes with $\theta=0.2$ (left), $\theta=0.8$ (middle), and $\theta=-0.5$ (right).}
+\label{fig:LW1.MA1comp}
+\end{figure}
+
+In contrast to AR(1) processes, MA(1) models do not exhibit radically different behavior with changing $\theta$.  This should not be too surprising given that they are simply linear combinations of white noise.
+
+
+%------------------------------------------------------
+\subsection{Correlation structure of MA($q$) processes}
+%------------------------------------------------------
+
+We saw in lecture and above how the ACF and PACF have distinctive features for AR($p$) models, and they do for MA($q$) models as well.  Here are examples of four MA($q$) processes.  As before, we'll use a really big $n$ so as to make them ``pure'', which will provide a much better estimate of the correlation structure.
+
+<<MAqSims, eval=TRUE, echo=TRUE>>=
+set.seed(123)
+## the 4 MA coefficients
+MAq <- c(0.7, 0.2, -0.1, -0.3)
+## empty list for storing models
+MA.mods <- list()
+## loop over orders of q
+for(q in 1:4) {
+  ## assume SD=1, so not specified
+  MA.mods[[q]] <- arima.sim(n=1000, list(ma=MAq[1:q]))
+}
+@
+
+Now that we have our four MA($q$) models, lets look at plots of the time series, ACF's, and PACF's.
+
+<<plotMApCompsEcho, eval=FALSE, echo=TRUE>>=
+## set up plot region
+par(mfrow=c(4,3))
+## loop over orders of q
+for(q in 1:4) {
+  plot.ts(MA.mods[[q]][1:50],
+          ylab=paste("MA(",q,")",sep=""))
+  acf(MA.mods[[q]], lag.max=12)
+  pacf(MA.mods[[q]], lag.max=12, ylab="PACF")
+}
+@
+
+\begin{figure}[htp]
+\begin{center}
+<<plotMApComps, eval=TRUE, echo=FALSE, fig=TRUE, height=8>>=
+## set the margins & text size
+par(mfrow=c(4,3), mar=c(4,4,0.5,0.5), oma=c(0,0,0,0), cex=1)
+## loop over orders of q
+for(q in 1:4) {
+  plot.ts(MA.mods[[q]][1:50],ylab=paste("MA(",q,")",sep=""))
+  acf(MA.mods[[q]], lag.max=12)
+  pacf(MA.mods[[q]], lag.max=12, ylab="PACF")
+}
+@
+\end{center}
+\caption{Time series of simulated MA($q$) processes (left column) of increasing orders from 1-4 (rows) with their associated ACF's (center column) and PACF's (right column).  Note that only the first 50 values of $x_t$ are plotted.}
+\label{fig:LW1.MAqComps}
+\end{figure}
+
+\noindent Note very little qualitative difference in the realizations of the four MA($q$) processes (Figure \ref{fig:LW1.MAqComps}).  As we saw in lecture and is evident from our examples here, however, the ACF for an MA($q$) process goes to zero for lags > $q$, but the PACF tails off toward zero very slowly.  This is an important diagnostic tool when trying to identify the order of $q$ in ARMA($p,q$) models.
+
+
+%====================================================
+\section{Autoregressive moving-average (ARMA) models}
+%====================================================
+
+ARMA($p,q$) models have a rich history in the time series literature, but they are not nearly as common in ecology as plain AR($p$) models.  As we discussed in lecture, both the ACF and PACF are important tools when trying to identify the appropriate order of $p$ and $q$.  Here we will see how to simulate time series from AR($p$), MA($q$), and ARMA($p,q$) processes, as well as fit time series models to data based on insights gathered from the ACF and PACF.
+
+We can write an ARMA($p,q$) as a mixture of AR($p$) and MA($q$) models, such that
+
+\begin{equation}\label{eqn:ARMAdefn}
+x_t = \phi_1x_{t-1} + \phi_2x_{t-2} + \dots + \phi_p x_{t-p} + w_t + \theta w_{t-1} + \theta_2 w_{t-2} + \dots + \theta_q x_{t-q},
+\end{equation}
+
+\noindent and the $w_t$ are white noise.
+
+%----------------------------------------------------------
+\subsection{Fitting ARMA($p,q$) models with \texttt{arima}}
+%----------------------------------------------------------
+
+We have already seen how to simulate AR($p$) and MA($q$) models with \texttt{arima.sim}; the same concepts apply to ARMA($p,q$) models and therefore we will not do that here.  Instead, we will move on to fitting ARMA($p,q$) models when we only have a realization of the process (\emph{i.e.}, data) and do not know the underlying parameters that generated it.
+
+The function \texttt{arima} accepts a number of arguments, but two of them are most important:
+
+\begin{description}
+\item [\texttt{   x }] a univariate time series
+\item [\texttt{   order }] a vector of length 3 specifying the order of ARIMA(p,d,q) model
+\end{description}
+
+\noindent In addition, note that by default \texttt{arima} will estimate an underlying mean of the time series unless $d>0$.  For example, an AR(1) process with mean $\mu$ would be written
+
+\begin{equation}\label{eqn:AR1mean}
+x_t = \mu + \phi (x_{t-1} - \mu) + w_t.
+\end{equation}
+
+\noindent If you know for a fact that the time series data have a mean of zero (\emph{e.g.}, you already subtracted the mean from them), you should include the argument \texttt{include.mean=FALSE}, which is set to \texttt{TRUE} by default.  Note that ignoring and not estimating a mean in ARMA($p,q$) models when one exists will bias the estimates of all other parameters.
+
+Let's see an example of how \texttt{arima} works.  First we'll simulate an ARMA(2,2) model and then estimate the parameters to see how well we can recover them.  In addition, we'll add in a constant to create a non-zero mean, which \texttt{arima} reports as \texttt{intercept} in its output.
+
+<<ARMAest, eval=TRUE, echo=TRUE>>=
+set.seed(123)
+## ARMA(2,2) description for arim.sim()
+ARMA22 <- list(order=c(2,0,2), ar=c(-0.7,0.2), ma=c(0.7,0.2))
+## mean of process
+mu <- 5
+## simulated process (+ mean)
+ARMA.sim <- arima.sim(n=10000, model=ARMA22) + mu
+## estimate parameters
+arima(x=ARMA.sim, order=c(2,0,2))
+@
+
+It looks like we were pretty good at estimating the true parameters, but our sample size was admittedly quite large (the estimate of the variance of the process errors is reported as \verb@sigma^2@ below the other coefficients).  As an exercise, try decreasing the length of time series in the  \texttt{arima.sim} call above from 10,000 to something like 100 and see what effect it has on the parameter estimates.
+
+%---------------------------------------
+\subsection{Searching over model orders}
+%---------------------------------------
+
+In an ideal situation, you could examine the ACF and PACF of the time series of interest and immediately decipher what orders of $p$ and $q$ must have generated the data, but that doesn't always work in practice.  Instead, we are often left with the task of searching over several possible model forms and seeing which of them provides the most parsimonious fit to the data.  There are two easy ways to do this for ARIMA models in \texttt{R}.  The first is to write a little script that loops ove the possible dimensions of $p$ and $q$.  Let's try that for the process we simulated above and search over orders of $p$ and $q$ from 0-3 (it will take a few moments to run and will likely report an error about a ``\verb@possible convergence problem@'', which you can ignore).
+
+<<ARMAsearch1, eval=TRUE, echo=TRUE>>=
+## empty list to store model fits
+ARMA.res <- list()
+## set counter
+cc <- 1
+## loop over AR
+for(p in 0:3) {
+  ## loop over MA
+  for(q in 0:3) {
+    ARMA.res[[cc]] <- arima(x=ARMA.sim,order=c(p,0,q))
+    cc <- cc + 1
+  }
+}
+## get AIC values for model evaluation
+ARMA.AIC <- sapply(ARMA.res,function(x) x$aic)
+## model with lowest AIC is the best
+ARMA.res[[which(ARMA.AIC==min(ARMA.AIC))]]
+@
+
+It looks like our search worked, so let's look at the other method for fitting ARIMA models.  The \texttt{auto.arima} function in the package \texttt{forecast} will conduct an automatic search over all possible orders of ARIMA models that you specify.  For details, type \verb@?auto.arima@ after loading the package.  Let's repeat our search using the same criteria.
+
+<<autoARIMA, eval=TRUE, echo=TRUE>>=
+## (install if necessary) & load forecast pkg
+if(!require("forecast")) {
+    install.packages("forecast")
+    library("forecast")
+}
+## find best ARMA(p,q) model
+auto.arima(ARMA.sim, start.p=0, max.p=3, start.q=0, max.q=3)
+@
+
+\noindent We get the same results with an increase in speed and less coding, which is nice.  If you want to see the form for each of the models checked by \texttt{auto.arima} and their associated AIC values, include the argument \texttt{trace=1}.
+
+
+\clearpage
+\renewcommand{\rightmark}{}
+\section*{Problems}
+\addcontentsline{toc}{section}{Problems}
+
+We have seen how to do a variety of introductory time series analyses with \texttt{R}.  Now it is your turn to apply the information you learned here and in lecture to complete some analyses.  You have been asked by a colleauge to help analyze some time series data she collected as part of an experiment on the effects of light and nutrients on the population dynamics of phytoplankton.  Specifically, after controlling for differences in light and temperature, she wants to know if the natural log of population density can be modeled with some form of ARMA($p,q$) model.  The data are expressed as the number of cells per milliliter recorded every hour for one week beginning at 8:00 AM on December 1, 2014; you can find them here:
+
+<<HW1_pre, eval=FALSE, echo=TRUE>>=
+## get phytoplankton data
+pp <- "http://faculty.washington.edu/scheuerl/phytoDat.txt"
+pDat <- read.table(pp)
+@
+
+\noindent Use the information above to do the following:
+
+\begin{hwenumerate} 
+
+\item Convert \texttt{pDat}, which is a \texttt{data.frame} object, into a \texttt{ts} object.  This bit of code might be useful to get you started:
+
+<<HW1_1, eval=FALSE, echo=TRUE>>=
+## what day of 2014 is Dec 1st?
+dBegin <- as.Date("2014-12-01")
+dayOfYear <- (dBegin - as.Date("2014-01-01") + 1)
+@
+
+\item Plot the time series of phytoplankton density and provide a brief description of any notable features.
+
+\item Although you do not have the actual measurements for the specific temperature and light regimes used in the experiment, you have been informed that they follow a regular light/dark period with accompanying warm/cool temperatures.  Thus, estimating a fixed seasonal effect is justifiable.  Also, the instrumentation is precise enough to preclude any systematic change in measurements over time ($i.e.$, you can assume $m_t = 0$ for all $t$).  Obtain the time series of the estimated log-density of phytoplankton absent any hourly effects caused by variation in temperature or light. ($Hint$: You will need to do some decomposition.)
+
+\item Use diagnostic tools to identify the possible order(s) of ARMA model(s) that most likely describes the log of population density for this particular experiment.  Note that at this point you should be focusing your analysis on the results obtained in Question 3.
+
+\item Use some form of search to identify what form of ARMA($p,q$) model best describes the log of population density for this particular experiment. Use what you learned in Question 4 to inform possible orders of $p$ and $q$. ($Hint$: if you use \texttt{auto.arima}, include the additional argument \texttt{seasonal=FALSE})
+
+\item Write out the best model in the form of Equation \eqref{eqn:ARMAdefn} using the underscore notation to refer to subscripts ($e.g.$, write \verb@x_t@ for $x_t$). You can round any parameters/coefficients to the nearest hundreth. ($Hint$: if the mean of the time series is not zero, refer to Eqn 1.27 in the lab handout).
+
+\end{hwenumerate}
+
+
+%----------------
+% end of content
+%----------------
+
+<<reset, echo=FALSE, include.source=FALSE>>=
+options(prompt="> ", continue=" +", width=120)
+@

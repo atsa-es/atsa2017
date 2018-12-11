@@ -1,0 +1,13 @@
+\input{../tex/headerfile}
+\input{../tex/mathdefs}
+\setcounter{MaxMatrixCols}{20}
+\usepackage{enumerate}
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+\SweaveInput{linear-regression-models-matrix-content.Rnw}
+\SweaveInput{Homework-Key-Linear-Regression-content.Rnw}
+
+\bibliography{../tex/Fish507}
+
+\end{document}

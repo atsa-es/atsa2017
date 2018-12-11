@@ -1,0 +1,13 @@
+\begin{Schunk}
+\begin{Sinput}
+ # set up plot region
+ par(mfrow=c(4,3))
+ # loop over orders of q
+ for(q in 1:4) {
+   plot.ts(MA.mods[[q]][1:50],
+           ylab=paste("MA(",q,")",sep=""))
+   acf(MA.mods[[q]], lag.max=12)
+   pacf(MA.mods[[q]], lag.max=12, ylab="PACF")
+ }
+\end{Sinput}
+\end{Schunk}

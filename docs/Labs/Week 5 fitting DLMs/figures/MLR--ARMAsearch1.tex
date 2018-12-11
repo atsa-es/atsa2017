@@ -1,0 +1,32 @@
+\begin{Schunk}
+\begin{Sinput}
+ # empty list to store model fits
+ ARMA.res <- list()
+ # set counter
+ cc <- 1
+ # loop over AR
+ for(p in 0:3) {
+   # loop over MA
+   for(q in 0:3) {
+     ARMA.res[[cc]] <- arima(x=ARMA.sim,order=c(p,0,q))
+     cc <- cc + 1
+   }
+ }
+ # get AIC values for model evaluation
+ ARMA.AIC <- sapply(ARMA.res,function(x) x$aic)
+ # model with lowest AIC is the best
+ ARMA.res[[which(ARMA.AIC==min(ARMA.AIC))]]
+\end{Sinput}
+\begin{Soutput}
+Series: ARMA.sim 
+ARIMA(2,0,2) with non-zero mean 
+
+Coefficients:
+          ar1     ar2     ma1     ma2  intercept
+      -0.7079  0.1924  0.6912  0.2001     4.9975
+s.e.   0.0291  0.0284  0.0289  0.0236     0.0125
+
+sigma^2 estimated as 0.9972:  log likelihood=-14175.92
+AIC=28363.84   AICc=28363.84   BIC=28407.1
+\end{Soutput}
+\end{Schunk}

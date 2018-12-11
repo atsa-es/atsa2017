@@ -1,0 +1,12 @@
+\begin{Schunk}
+\begin{Sinput}
+ # set up plot region
+ par(mfrow=c(1,2))
+ # plot normal variates with mean
+ plot.ts(GWN)
+ abline(h=5, col="blue", lty="dashed")
+ # plot Poisson variates with mean
+ plot.ts(PWN)
+ abline(h=20, col="blue", lty="dashed")
+\end{Sinput}
+\end{Schunk}

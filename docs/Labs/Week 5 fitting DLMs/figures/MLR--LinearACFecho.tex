@@ -1,0 +1,16 @@
+\begin{Schunk}
+\begin{Sinput}
+ # length of ts
+ nn <- 100
+ # create straight line
+ tt <- seq(nn)
+ # set up plot area
+ par(mfrow=c(1,2))
+ # plot line
+ plot.ts(tt, ylab=expression(italic(x[t])))
+ # get ACF
+ line.acf <- acf(tt, plot=FALSE)
+ # plot ACF
+ plot.acf(line.acf)
+\end{Sinput}
+\end{Schunk}

@@ -1,0 +1,16 @@
+\begin{Schunk}
+\begin{Sinput}
+ # setup plot region
+ par(mfrow=c(1,3))
+ # plot the ts
+ plot.ts(MA1.sm,
+         ylab=expression(italic(x)[italic(t)]),
+         main=expression(paste(theta," = 0.2")))
+ plot.ts(MA1.lg,
+         ylab=expression(italic(x)[italic(t)]),
+         main=expression(paste(theta," = 0.8")))
+ plot.ts(MA1.neg,
+         ylab=expression(italic(x)[italic(t)]),
+         main=expression(paste(theta," = -0.5")))
+\end{Sinput}
+\end{Schunk}

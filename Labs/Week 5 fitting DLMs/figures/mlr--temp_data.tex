@@ -1,0 +1,10 @@
+\begin{Schunk}
+\begin{Sinput}
+ # get N Hemisphere land & ocean temperature anomalies from NOAA
+ ww1 <- "http://www.ncdc.noaa.gov/cag/time-series/"
+ ww2 <- "global/nhem/land_ocean/p12/12/1880-2014.csv"
+ Temp <- read.csv(paste(ww1,ww2,sep=""), skip=2)
+ # create ts object
+ tmp <- ts(data=Temp$Value, frequency=12, start=c(1880,1))
+\end{Sinput}
+\end{Schunk}

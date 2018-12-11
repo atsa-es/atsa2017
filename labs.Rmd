@@ -1,0 +1,16 @@
+---
+title: "Labs"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+| Week | Topic  |  Lab  |  Homework |  Key  |
+|--|----------|:-------------:|:------:|:------:|
+| 0 | Review of basic matrix math in R |  [Matrix Math in R](Labs/Week 0 basic matrix/basic-matrix-math.pdf) | Homework questions are at the end of the lab | [Key](Labs/Week 0 basic matrix/basic-matrix-math-key.pdf) |
+| 1 | Linear regression in matrix form |  [Lab 1 Linear regression](Labs/Week 1 linear regression/Lab 1 Linear Regression in Matrix Form.pdf) | Homework questions are at the end of the lab | [Key](Labs/Week 1 linear regression/Homework-Key-Linear-Regression.pdf) |
+| 2 | Time series functions in R |  [Lab 2 ts functions](Labs/Week 2 intro to ts/intro-ts-funcs.pdf) | Homework questions are at the end of the lab | [Key](Labs/Week 2 intro to ts/HW2_answer_key_pdf.pdf) |
+| 3 | Fitting univariate state-space models |  [Lab 3 uni ss](Labs/Week 3 fitting uni ss models/fitting-univariate-state-space.pdf) | Homework questions are at the end of the lab | [Key](Labs/Week 3 fitting uni ss models/fitting-univariate-ss-key.pdf) |
+| 3 | Intro to JAGS |  [Lab 3 JAGS](Labs/Week 3 intro to jags/intro-to-jags.pdf) [fitting w JAGs example code](Labs/Week 3 fitting uni ss models/Fitting univariate state-space models in JAGS.R) - [fitting w STAN example code](Labs/Week 3 Stan code/ss_ar_mean.stan)| |  |

@@ -1,0 +1,14 @@
+\begin{Schunk}
+\begin{Sinput}
+ set.seed(123)
+ # the 4 MA coefficients
+ MAq <- c(0.7, 0.2, -0.1, -0.3)
+ # empty list for storing models
+ MA.mods <- list()
+ # loop over orders of q
+ for(q in 1:4) {
+   # assume SD=1, so not specified
+   MA.mods[[q]] <- arima.sim(n=1000, list(ma=MAq[1:q]))
+ }
+\end{Sinput}
+\end{Schunk}

@@ -1,0 +1,67 @@
+\SweaveOpts{keep.source=TRUE, prefix.string=../figures/HWCovar-, eps=FALSE, split=FALSE}
+<<RUNFIRST, echo=FALSE, include.source=FALSE>>=
+require(MARSS)
+require(stats)
+require(forecast)
+options(prompt=" ", continue=" ")
+@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
+\renewcommand{\rightmark}{}
+\section*{Problems}
+\addcontentsline{toc}{section}{Problems}
+
+For these problems, use the following code to load in phytoplankton data, covariates, and z-score all the data.  Then use \verb@dat@ and \verb@covars@ directly in your code.
+<<load-data, keep.source=TRUE>>=
+phytos = c("Cryptomonas", "Diatoms", "Greens",
+            "Unicells", "Other.algae")
+yrs = lakeWAplanktonTrans[,"Year"]%in%1985:1994
+dat = t(lakeWAplanktonTrans[yrs,phytos])
+#z-score the data
+avg = apply(dat, 1, mean, na.rm=TRUE)
+sd = sqrt(apply(dat, 1, var, na.rm=TRUE))
+dat = (dat-avg)/sd
+rownames(dat)=phytos
+#z-score the covariates
+covars = rbind(Temp=lakeWAplanktonTrans[yrs,"Temp"],
+               TP=lakeWAplanktonTrans[yrs,"TP"])
+avg = apply(covars, 1, mean)
+sd = sqrt(apply(covars, 1, var, na.rm=TRUE))
+covars =  (covars-avg)/sd
+rownames(covars) = c("Temp","TP")
+
+#always check that the mean and variance are 1 after z-scoring
+apply(dat,1,mean,na.rm=TRUE) #this should be 0
+apply(dat,1,var,na.rm=TRUE) #this should be 1
+@
+
+Here are some guidelines to help you answer the questions:
+\begin{itemize}
+\item Use a MARSS model that allows for both observation and process error.
+\item Assume that the observation errors are independent and identically distributed. You can further assume that any process errors are independent from one another, but the variances differ by taxon.
+\item Assume that each group is an observation of its own process. This means \verb@Z="identity"@.
+\item Use \verb@B="diagonal and unequal"@.  This implies that each of the taxa are operating under varying degrees of density-dependence, and that they do not interact with any of the other taxa.
+\item All the data have been de-meaned and $\ZZ$ identity, therefore use \verb@U="zero"@ and \verb@A="zero"@.  Make sure to check that the means of the data are 0 and the variance is 1.
+\item Use \verb@tinitx=0@ (the default).  Do not change to \verb@tinitx=1@.  You can try it to see what happens but answer the questions with \verb@tinitx=0@.  Normally, \verb@tinitx=1@ will make your models fit more easily when you are estimating $\BB$, but in this case it causes a problem.  Why does the $\RR$ tend to go to zero when \verb@tinitx=1@ for the models we are fitting?
+\item Include a plot of residuals versus time and acf of residuals for each question. You only need to show these for the top model if the question involves comparing multiple models.
+\item Use AICc to compare models.
+\item Some of the models do not converge, however use for the purpose of the homework, use the unconverged models.  Thus use the output from \verb@MARSS()@ without any additional arguments.  If you want, you can try using \verb@control=list(maxit=1000)@ to increase the number of iterations.  Or you can try \verb@method="BFGS"@ in your \verb@MARSS()@ call. This will use the BFGS optimization method, however it may throw an error for these data.
+\item
+\end{itemize}
+
+\begin{hwenumerate}
+\item  How does month affect the mean phytoplankton population growth rates? Show a plot of mean growth rate versus month. Estimate seasonal effects without any covariate (Temp, TP) effects.
+\item	It is likely that both temperature and total phosphorus (TP) affect phytoplankton population growth rates. Using MARSS models, evaluate which is the more important driver or if both are important. Leave out the seasonal covariates from question 1, i.e. only use Temp and TP as covariates.
+\item  Evaluate whether the effect of temperature on phytoplankton manifests itself via their underlying physiology (by affecting algal growth rates and thus abundance) or because physical changes in the water stratification makes them easier/harder to sample in some months. Leave out the seasonal covariates from question 1, i.e. only use Temp and TP as covariates.
+\item	Is there support for temperature or TP  affecting all functional groups' growth rates the same, or are the effects on one taxon different from another?
+\item Compare your results for questions 2-4 using an observation error only model, by using the lm() function.
+\item Then compare to a process error only model using the arima() function with the xreg argument.
+\item Compute a time-series cross-validation metric for the models and compare the results that you got using AICc for model comparison.
+\end{hwenumerate}
+
+
+<<Reset, echo=FALSE>>=
+options(prompt="> ", continue="+ ")
+options(width=120)
+@

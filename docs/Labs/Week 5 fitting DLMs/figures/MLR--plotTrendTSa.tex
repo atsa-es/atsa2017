@@ -1,0 +1,8 @@
+\begin{Schunk}
+\begin{Sinput}
+ # estimate of trend
+ co2.trend <- filter(co2, filter=fltr, method="convo", sides=2)
+ # plot the trend
+ plot.ts(co2.trend, ylab="Trend", cex=1)
+\end{Sinput}
+\end{Schunk}

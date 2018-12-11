@@ -13,8 +13,8 @@ navbar:
         href: lectures.html
       - text: "Videos"
         href: lecture_video.html
-    - text: "Computer Labs"
-      href: comp_labs.html
+    - text: "Labs"
+      href: labs.html
     - text: "Homework"
       href: homework.html
     - text: "Final Project"

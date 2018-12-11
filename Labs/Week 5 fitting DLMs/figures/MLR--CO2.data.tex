@@ -1,0 +1,9 @@
+\begin{Schunk}
+\begin{Sinput}
+ # get CO2 data from Mauna Loa observatory
+ www <- "ftp://aftp.cmdl.noaa.gov/products/trends/co2/co2_mm_mlo.txt"
+ CO2 <- read.table(www)[,-c(3,4,6,7)]
+ # assign better column names
+ colnames(CO2) <- c("year","month","ppm")
+\end{Sinput}
+\end{Schunk}

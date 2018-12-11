@@ -1,0 +1,12 @@
+\input{../tex/headerfile}
+\input{../tex/mathdefs}
+\setcounter{MaxMatrixCols}{20}
+\usepackage{enumerate}
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+\SweaveInput{fitting-univariate-ss-key-content.Rnw}
+
+\bibliography{../tex/Fish507}
+
+\end{document}
