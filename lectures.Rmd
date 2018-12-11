@@ -13,8 +13,8 @@ library(knitr)
 | 1 | [Introduction to Time Series](Lectures/Week 1/Lec 1 - Introduction to time series.pdf) |  Decomposition, backshift operator, differencing, etc |  | [Download data](Lectures/Week 1/week_1_misc_code.R) |
 | 1 | [Covariance and Correlation](Lectures/Week 1/Lec 2 - Covariance & correlation.pdf) |  Examining covariance and correlation   |  |  |
 |  | |  | |  |  |
-| 2 | [Univariate time series models](Lectures/Week 2/Lec 3 - Stationary & nonstationary models.pdf) |  Stationary and nonstationary models for univariate time series |  |  |
-| 2 | [Estimation and Forecasting](Lectures/Week 2/Lec 4 - Estimation & forecasting.pdf) |  Estimation procedures for fitting time series models   |  |  |
+| 2 | [Univariate time series models](Lectures/Week 2/Lec 3 - Stationary and nonstationary models.pdf) |  Stationary and nonstationary models for univariate time series |  |  |
+| 2 | [Estimation and Forecasting](Lectures/Week 2/Lec 4 - Estimation and forecasting.pdf) |  Estimation procedures for fitting time series models   |  |  |
 |  | |  | |  |  |
 | 3 | [Univariate time series models](Lectures/Week 3/Lec 5 - Intro to Univariate State-Space Models.pdf) |  Introduction to univariate state-space models | [MARSS Ref Sheet](Lectures/Week 3/MARSS_Reference_Sheet.pdf) | [univariate_example_1.R](Lectures/Week 3/univariate_example_1.R) [univariate_example_2.R](Lectures/Week 3/univariate_example_2.R)  [univariate_example_3.R](Lectures/Week 3/univariate_example_3.R)  [univariate_example_4.R](Lectures/Week 3/univariate_example_4.R)|
 | 3 | [Estimation and Forecasting](Lectures/Week 3/Lec 6 - Intro to multivariate state-space models.pdf) |  Introduction to multivariate state-space models  |  | [MARSS_example_1.R](Lectures/Week 3/Lec_6_MARSS_example_1.R) [MARSS_example_2.R](Lectures/Week 3/Lec_6_MARSS_example_2.R) [MARSS_example_3.R](Lectures/Week 3/Lec_6_MARSS_example_3.R) [MARSS_example_4.R](Lectures/Week 3/Lec_6_MARSS_example_4.R) [MARSS_example_5.R](Lectures/Week 3/Lec_6_MARSS_example_5.R) |
@@ -31,7 +31,7 @@ library(knitr)
 | 7 | [GLMs 2](Lectures/Week 7/Lec 14 - Zeros and non-normal data.pdf) |  Dealing with zeros and non-normal data |  |  |
 | 7 | [Bayesian estimation](Lectures/Week 7/Lec 13 - Bayesian estimation in Stan.pdf) |  Bayesian estimation with STAN   |  |  |
 |  | |  | |  |  |
-| 8 | [Spatial correlation](Lectures/Week 8/Lec 15 - Including spatial correlation.pdf) |  Spatiotemporal models  |  | [Lec 15 - Analyzing Snotel data.R](Lectures/Week 8/Lec 15 - Analyzing Snotel data.R) |
+| 8 | [Spatial correlation](Lectures/Week 8/Lec 15 - Including spatial correlation.pdf) |  Spatiotemporal models  |  | [Analyzing Snotel data.R](Lectures/Week 8/Lec 15 - Analyzing Snotel data.R) |
 | 8 | [Estimating Interactions I](Lectures/Week 8/Lec 16 - Estimating Interactions I.pdf) |  Estimating species interaction strengths from ts data |  | [Gompertz_example_0.R](Lectures/Week 8/Gompertz_example_0.R) [Gompertz_example_1.R](Lectures/Week 8/Gompertz_example_1.R) [Gompertz_example_2.R](Lectures/Week 8/Gompertz_example_2.R) |
 |  | |  | |  |  |
 | 9 | [Estimating Interactions II](Lectures/Week 9/Lec 17 - Estimating Interactions II.pdf) |  Estimating species interaction strengths from ts data   |  | [GompertzSS_REML.R](Lectures/Week 8/GompertzSS_REML.R) |
