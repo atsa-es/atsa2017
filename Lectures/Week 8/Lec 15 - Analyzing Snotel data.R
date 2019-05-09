@@ -1,11 +1,42 @@
 meta = read.csv("SNOTEL_metadata.csv")
 y = read.csv("SNOTEL_Washington_1981_2013.csv")
 
-y$matches = match(y$Station.Name,meta$Station.Name)
-y = y[-which(is.na(y$matches)),]
+y$matches = match(y$Station.Id,meta$Station.Id)
+if(any(is.na(y$matches))) y = y[-which(is.na(y$matches)),]
 y$lat = meta$Latitude[y$matches]
 y$lon = meta$Longitude[y$matches]
 y$elev = meta$Elevation[y$matches]
+snotel_meta = meta[unique(y$matches),]
+y = y[,colnames(y)!="matches"]
+y = y[y$Station.Name !="",]
+
+library("reshape2")
+y2 <- melt(y, id.vars = c("Station.Name","Station.Id","Water.Year"), measure.vars=4:13)
+stations <- unique(y2$Station.Name)
+years <- min(y2$Water.Year):max(y2$Water.Year)
+nyears <- length(years)
+yy <- data.frame(Station=rep(stations, each=nyears*12),
+                 Station.Id=NA,
+                 Year = rep(rep(years, each=12),length(stations)), 
+                 Month = rep(month.abb, nyears*length(stations)),
+                 SWE = NA)
+for(j in stations){
+  for(i in years){
+    for(m in month.abb){
+      valy <- which(y2$Station.Name==j & y2$Water.Year==i & y2$variable==m)
+      valyy <- which(yy$Station==j & yy$Year==i & yy$Month==m)
+      yy[valyy,"Station.Id"]=y[which(y$Station.Name==j)[1],"Station.Id"]
+      if(length(valy)!=0){ 
+        yy[valyy,"SWE"]=y2[valy,"value"]
+      }
+    }
+  }
+}
+yy$Date <- as.Date(paste("01", yy$Month, yy$Year),"%d %b %Y")
+snotel = yy
+snotel_meta$Station_Name <- str_trim(str_replace_all(snotel_meta$Station_Name, "_", " "))
+save(snotel, snotel_meta, file="snotel.RData")
+
 
 # Let's only use Feb SWE
 unique(y$Station.Id)
@@ -23,7 +54,7 @@ for(i in 1:length(unique(y$Station.Id))) {
 
 library(PBSmapping)
 data(nepacLL)
-plotMap(nepacLL, ylim=c(min(y$lat)-0.2,max(y$lat)+0.2),xlim=c(min(y$lon)-0.2,max(y$lon)+0.2),col="grey70")
+plotMap(nepacLL, ylim=c(min(y$lat)-1,max(y$lat)+1),xlim=c(min(y$lon)-1.5,max(y$lon)+1),col="grey70")
 points(y$lon,y$lat,col="tomato1",cex=0.7)
 
 # Fit the gls () models to the data
